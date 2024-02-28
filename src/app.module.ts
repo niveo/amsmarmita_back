@@ -5,10 +5,22 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Comedores, ComedoresSchema } from './schemas/comedores.schema';
 import { ComedoresService } from './services/comedores.service';
 import { ComedoresController } from './controllers/comedores.controller';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { URL_MONGODB } from './common/constantes';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/marmitadb'),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      useFactory: (config: ConfigService) => {
+        return {
+          uri: config.get(URL_MONGODB),
+        };
+      },
+      inject: [ConfigService],
+    }),
     MongooseModule.forFeature([
       { name: Comedores.name, schema: ComedoresSchema },
     ]),

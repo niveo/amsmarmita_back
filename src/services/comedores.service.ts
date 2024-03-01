@@ -1,12 +1,13 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Comedores } from 'src/schemas/comedores.schema';
-import { UpdateComerdoresDto } from 'src/dtos/update-comedores.dto';
-import { InsertComerdoresDto } from 'src/dtos/insert-comedores.dto';
+import { Comedores } from '../schemas/comedores.schema';
+import { UpdateComerdoresDto } from '../dtos/update-comedores.dto';
+import { InsertComerdoresDto } from '../dtos/insert-comedores.dto';
+import { ServicoInterface } from '../interfaces/servicos.interface';
 
 @Injectable()
-export class ComedoresService {
+export class ComedoresService implements ServicoInterface {
   constructor(
     @InjectModel(Comedores.name) private ComedoresModel: Model<Comedores>,
   ) {}

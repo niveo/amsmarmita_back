@@ -8,34 +8,26 @@ import { ServicoInterface } from '../interfaces/servicos.interface';
 
 @Injectable()
 export class ComedoresService implements ServicoInterface {
-  constructor(
-    @InjectModel(Comedores.name) private ComedoresModel: Model<Comedores>,
-  ) {}
+  constructor(@InjectModel(Comedores.name) private model: Model<Comedores>) {}
 
-  async create(insertComerdoresDto: InsertComerdoresDto): Promise<Comedores> {
-    const createdCat = new this.ComedoresModel(insertComerdoresDto);
+  async create(valueDto: InsertComerdoresDto): Promise<Comedores> {
+    const createdCat = new this.model(valueDto);
     return createdCat.save();
   }
 
   async findById(id: string): Promise<Comedores> {
-    return this.ComedoresModel.findById(id).exec();
+    return this.model.findById(id).exec();
   }
 
   async findAll(): Promise<Comedores[]> {
-    return this.ComedoresModel.find().exec();
+    return this.model.find().exec();
   }
 
   async delete(id: string): Promise<any> {
-    return this.ComedoresModel.deleteOne({ _id: id }).exec();
+    return this.model.deleteOne({ _id: id }).exec();
   }
 
-  async update(
-    id: string,
-    updateComerdoresDto: UpdateComerdoresDto,
-  ): Promise<any> {
-    return this.ComedoresModel.findByIdAndUpdate(
-      { _id: id },
-      updateComerdoresDto,
-    ).exec();
+  async update(id: string, valueDto: UpdateComerdoresDto): Promise<any> {
+    return this.model.findByIdAndUpdate({ _id: id }, valueDto).exec();
   }
 }

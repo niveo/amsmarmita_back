@@ -10,6 +10,11 @@ import { URL_MONGODB } from './common/constantes';
 import { Marmita, MarmitaSchema } from './schemas/marmita.schema';
 import { MarmitasController } from './controllers/marmita.controller';
 import { MarmitaService } from './services/marmita.service';
+import { Grupo, GrupoSchema } from './schemas/grupo.schema';
+import { Pratos, PratosSchema } from './schemas/pratos.schema';
+import { GrupoService } from './services/grupo.service';
+import { GrupoController } from './controllers/grupo.controller';
+import { PratoService } from './services/prato.service';
 
 @Module({
   imports: [
@@ -27,9 +32,22 @@ import { MarmitaService } from './services/marmita.service';
     MongooseModule.forFeature([
       { name: Comedores.name, schema: ComedoresSchema },
       { name: Marmita.name, schema: MarmitaSchema },
+      { name: Grupo.name, schema: GrupoSchema },
+      { name: Pratos.name, schema: PratosSchema },
     ]),
   ],
-  controllers: [AppController, ComedoresController, MarmitasController],
-  providers: [AppService, ComedoresService, MarmitaService],
+  controllers: [
+    AppController,
+    ComedoresController,
+    MarmitasController,
+    GrupoController,
+  ],
+  providers: [
+    AppService,
+    ComedoresService,
+    MarmitaService,
+    GrupoService,
+    PratoService,
+  ],
 })
 export class AppModule {}

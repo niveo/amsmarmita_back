@@ -1,4 +1,4 @@
-import { UpdateComerdoresDto } from 'src/dtos/update-comedores.dto';
+import { UpdateComerdoresDto } from '../dtos/update-comedores.dto';
 import { ComedoresService } from './../services/comedores.service';
 import {
   Body,
@@ -9,7 +9,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { InsertComerdoresDto } from 'src/dtos/insert-comedores.dto';
+import { InsertComerdoresDto } from '../dtos/insert-comedores.dto';
 
 @Controller({
   path: 'comedores',

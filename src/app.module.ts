@@ -7,6 +7,9 @@ import { ComedoresService } from './services/comedores.service';
 import { ComedoresController } from './controllers/comedores.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { URL_MONGODB } from './common/constantes';
+import { Marmita, MarmitaSchema } from './schemas/marmita.schema';
+import { MarmitasController } from './controllers/marmita.controller';
+import { MarmitaService } from './services/marmita.service';
 
 @Module({
   imports: [
@@ -23,9 +26,10 @@ import { URL_MONGODB } from './common/constantes';
     }),
     MongooseModule.forFeature([
       { name: Comedores.name, schema: ComedoresSchema },
+      { name: Marmita.name, schema: MarmitaSchema },
     ]),
   ],
-  controllers: [AppController, ComedoresController],
-  providers: [AppService, ComedoresService],
+  controllers: [AppController, ComedoresController, MarmitasController],
+  providers: [AppService, ComedoresService, MarmitaService],
 })
 export class AppModule {}

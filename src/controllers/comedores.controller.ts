@@ -1,5 +1,5 @@
 import { UpdateComerdoresDto } from '../dtos/update-comedores.dto';
-import { ComedoresService } from './../services/comedores.service';
+import { ComedoresService } from '../services/comedores.service';
 import {
   Body,
   Controller,

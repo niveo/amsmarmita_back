@@ -18,7 +18,13 @@ export class Pratos {
   grupo: Grupo;
 
   @Prop([String])
-  composicao: string[];
+  composicoes: string[];
+
+  @Prop({
+    max: 100,
+    maxlength: 100,
+  })
+  observacao: string;
 }
 
 export const PratosSchema = SchemaFactory.createForClass(Pratos);

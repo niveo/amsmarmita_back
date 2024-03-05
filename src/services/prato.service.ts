@@ -14,6 +14,8 @@ export class PratoService implements ServicoInterface {
     const createdCat = new this.model({
       nome: valueDto.nome,
       grupo: String(valueDto.grupoId).toObjectId(),
+      composicoes: valueDto.composicoes,
+      observacao: valueDto.observacao,
     });
     return createdCat.save();
   }
@@ -37,6 +39,8 @@ export class PratoService implements ServicoInterface {
         {
           nome: valueDto.nome,
           grupo: String(valueDto.grupoId).toObjectId(),
+          composicoes: valueDto.composicoes,
+          observacao: valueDto.observacao,
         },
       )
       .exec();

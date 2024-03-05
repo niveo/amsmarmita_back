@@ -6,4 +6,8 @@ export class InsertPratoDto {
 
   @IsNotEmpty()
   grupoId: string;
+
+  composicoes: string[];
+
+  observacao: string;
 }

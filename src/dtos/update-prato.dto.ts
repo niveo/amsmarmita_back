@@ -6,4 +6,8 @@ export class UpdatePratoDto {
 
   @IsNotEmpty()
   grupoId: string;
+
+  composicoes: string[];
+
+  observacao: string;
 }

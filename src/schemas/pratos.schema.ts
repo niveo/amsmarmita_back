@@ -16,6 +16,9 @@ export class Pratos {
 
   @Prop({ type: Types.ObjectId, ref: 'Grupo', required: true })
   grupo: Grupo;
+
+  @Prop([String])
+  composicao: string[];
 }
 
 export const PratosSchema = SchemaFactory.createForClass(Pratos);

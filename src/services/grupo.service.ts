@@ -20,7 +20,7 @@ export class GrupoService implements ServicoInterface {
   }
 
   async findAll(): Promise<Grupo[]> {
-    return this.model.find().exec();
+    return this.model.find().sort({ principal: 'desc', nome: 'asc' }).exec();
   }
 
   async delete(id: string): Promise<any> {

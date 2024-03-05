@@ -17,6 +17,7 @@ import { MarmitaService } from './services/marmita.service';
 import { GrupoService } from './services/grupo.service';
 import { GrupoController } from './controllers/grupo.controller';
 import { PratoService } from './services/prato.service';
+import { PratoController } from './controllers/prato.controller';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { PratoService } from './services/prato.service';
     ComedoresController,
     MarmitasController,
     GrupoController,
+    PratoController,
   ],
   providers: [
     AppService,

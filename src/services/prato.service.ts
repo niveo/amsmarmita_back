@@ -5,22 +5,15 @@ import { Pratos } from '../schemas/pratos.schema';
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
 import { Model } from 'mongoose';
-import { GrupoService } from './grupo.service';
 
 @Injectable()
 export class PratoService implements ServicoInterface {
-  constructor(
-    @InjectModel(Pratos.name) private model: Model<Pratos>,
-    private readonly grupoService: GrupoService,
-  ) {
- 
-  }
+  constructor(@InjectModel(Pratos.name) private model: Model<Pratos>) {}
 
   async create(valueDto: InsertPratoDto): Promise<Pratos> {
-    const grupo = await this.grupoService.findById(valueDto.grupoId);
     const createdCat = new this.model({
       nome: valueDto.nome,
-      grupo: grupo,
+      grupo: String(valueDto.grupoId).toObjectId(),
     });
     return createdCat.save();
   }
@@ -38,13 +31,12 @@ export class PratoService implements ServicoInterface {
   }
 
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {
-    const grupo = await this.grupoService.findById(valueDto.grupoId);
     return this.model
       .findByIdAndUpdate(
         { _id: id },
         {
           nome: valueDto.nome,
-          grupo: grupo,
+          grupo: String(valueDto.grupoId).toObjectId(),
         },
       )
       .exec();

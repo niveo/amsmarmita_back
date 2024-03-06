@@ -18,6 +18,12 @@ export class Grupo {
     default: false,
   })
   principal: boolean = false;
+
+  @Prop({
+    max: 100,
+    maxlength: 100,
+  })
+  observacao: string;
 }
 
 export const GrupoSchema = SchemaFactory.createForClass(Grupo);

@@ -32,11 +32,11 @@ import { PratoController } from './controllers/prato.controller';
       },
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([
-      { name: Comedores.name, schema: ComedoresSchema },
-      { name: Marmita.name, schema: MarmitaSchema },
-      { name: Grupo.name, schema: GrupoSchema },
-      { name: Pratos.name, schema: PratosSchema },
+    MongooseModule.forFeatureAsync([
+      { name: Comedores.name, useFactory: () => ComedoresSchema },
+      { name: Marmita.name, useFactory: () => MarmitaSchema },
+      { name: Grupo.name, useFactory: () => GrupoSchema },
+      { name: Pratos.name, useFactory: () => PratosSchema },
     ]),
   ],
   controllers: [

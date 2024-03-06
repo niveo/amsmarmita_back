@@ -2,10 +2,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Grupo } from './grupo.schema';
 
-export type PratosDocument = HydratedDocument<Pratos>;
+export type PratoDocument = HydratedDocument<Prato>;
 
-@Schema()
-export class Pratos {
+@Schema({
+  collection: 'pratos',
+})
+export class Prato {
   @Prop({
     index: 'asc',
     isRequired: true,
@@ -27,4 +29,4 @@ export class Pratos {
   observacao: string;
 }
 
-export const PratosSchema = SchemaFactory.createForClass(Pratos);
+export const PratoSchema = SchemaFactory.createForClass(Prato);

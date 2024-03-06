@@ -3,7 +3,9 @@ import { HydratedDocument } from 'mongoose';
 
 export type MarmitaDocument = HydratedDocument<Marmita>;
 
-@Schema()
+@Schema({
+  collection: 'marmitas',
+})
 export class Marmita {
   @Prop()
   lancamento: Date;

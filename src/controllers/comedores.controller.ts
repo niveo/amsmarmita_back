@@ -1,5 +1,5 @@
 import { UpdateComerdoresDto } from '../dtos/update-comedores.dto';
-import { ComedoresService } from '../services/comedores.service';
+import { ComedorService } from '../services/comedores.service';
 import {
   Body,
   Controller,
@@ -14,8 +14,8 @@ import { InsertComerdoresDto } from '../dtos/insert-comedores.dto';
 @Controller({
   path: 'comedores',
 })
-export class ComedoresController {
-  constructor(private readonly comedoresService: ComedoresService) {}
+export class ComedorController {
+  constructor(private readonly comedoresService: ComedorService) {}
 
   @Get()
   getAll() {

@@ -18,6 +18,9 @@ import { GrupoService } from './services/grupo.service';
 import { GrupoController } from './controllers/grupo.controller';
 import { PratoService } from './services/prato.service';
 import { PratoController } from './controllers/prato.controller';
+import { Pedido, PedidoSchema } from './schemas/pedido.schema';
+import { PedidoPrato, PedidoPratoSchema } from './schemas/pedido-prato.schema';
+import { PedidoService } from './services/pedido.service';
 
 @Module({
   imports: [
@@ -34,9 +37,39 @@ import { PratoController } from './controllers/prato.controller';
     }),
     MongooseModule.forFeatureAsync([
       { name: Comedor.name, useFactory: () => ComedorSchema },
-      { name: Marmita.name, useFactory: () => MarmitaSchema },
+      {
+        name: Marmita.name,
+        useFactory: (pedidoService: PedidoService) => {
+          const schema = MarmitaSchema;
+          schema.pre('deleteOne', function () {
+            console.log('deleteOne', this._id);
+          });
+          schema.pre(
+            'deleteMany',
+            { document: true, query: false },
+            function () {
+              console.log('deleteMany', this);
+            },
+          );
+          return schema;
+        },
+      },
       { name: Grupo.name, useFactory: () => GrupoSchema },
       { name: Prato.name, useFactory: () => PratoSchema },
+
+      {
+        name: Pedido.name,
+        useFactory: () => {
+          const schema = PedidoSchema;
+          schema.pre('save', function () {
+            console.log('Hello from pre save');
+          });
+
+          return schema;
+        },
+      },
+
+      { name: PedidoPrato.name, useFactory: () => PedidoPratoSchema },
     ]),
   ],
   controllers: [
@@ -52,6 +85,7 @@ import { PratoController } from './controllers/prato.controller';
     MarmitaService,
     GrupoService,
     PratoService,
+    PedidoService,
   ],
 })
 export class AppModule {}

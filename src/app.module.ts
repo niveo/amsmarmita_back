@@ -18,9 +18,8 @@ import { GrupoService } from './services/grupo.service';
 import { GrupoController } from './controllers/grupo.controller';
 import { PratoService } from './services/prato.service';
 import { PratoController } from './controllers/prato.controller';
-import { Pedido, PedidoSchema } from './schemas/pedido.schema';
-import { PedidoPrato, PedidoPratoSchema } from './schemas/pedido-prato.schema';
-import { PedidoService } from './services/pedido.service';
+import { PedidoModule } from './pedido/pedido.module';
+import { PedidoService } from './pedido/pedido.service';
 
 @Module({
   imports: [
@@ -41,36 +40,47 @@ import { PedidoService } from './services/pedido.service';
         name: Marmita.name,
         useFactory: (pedidoService: PedidoService) => {
           const schema = MarmitaSchema;
-          schema.pre('deleteOne', function () {
-            console.log('deleteOne', this._id);
+          schema.pre('deleteOne', function (next) {
+            const id = this.getQuery()['_id'].toString();
+            console.log('deleteOne', this.model.name, id);
+            pedidoService.deleteMarmitaId(id).then((ret: boolean) => {
+              if (ret) {
+                next();
+              } else {
+                console.error(
+                  'Não foi possivel excluir os pedidos vinculados a ' +
+                    Marmita.name +
+                    ' id ' +
+                    id,
+                );
+              }
+            });
           });
-          schema.pre(
-            'deleteMany',
-            { document: true, query: false },
-            function () {
-              console.log('deleteMany', this);
-            },
-          );
+          schema.pre('deleteMany', function (next) {
+            const ids = this.getQuery()['_id']['$in'];
+            console.log('deleteMany', this.model.name, ids);
+            pedidoService.deleteMarmitaIds(ids).then((ret: boolean) => {
+              if (ret) {
+                next();
+              } else {
+                console.error(
+                  'Não foi possivel excluir os pedidos vinculados a ' +
+                    Marmita.name +
+                    ' ids ' +
+                    ids,
+                );
+              }
+            });
+          });
           return schema;
         },
+        imports: [PedidoModule],
+        inject: [PedidoService],
       },
       { name: Grupo.name, useFactory: () => GrupoSchema },
       { name: Prato.name, useFactory: () => PratoSchema },
-
-      {
-        name: Pedido.name,
-        useFactory: () => {
-          const schema = PedidoSchema;
-          schema.pre('save', function () {
-            console.log('Hello from pre save');
-          });
-
-          return schema;
-        },
-      },
-
-      { name: PedidoPrato.name, useFactory: () => PedidoPratoSchema },
     ]),
+    PedidoModule,
   ],
   controllers: [
     AppController,
@@ -85,7 +95,6 @@ import { PedidoService } from './services/pedido.service';
     MarmitaService,
     GrupoService,
     PratoService,
-    PedidoService,
   ],
 })
 export class AppModule {}

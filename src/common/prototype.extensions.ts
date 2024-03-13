@@ -4,6 +4,9 @@ declare global {
     toBoolean(): boolean;
     toObjectId(): Types.ObjectId;
   }
+  interface Array<T> {
+    toObjectId(): Array<T>;
+  }
 }
 
 String.prototype.toBoolean = function () {
@@ -14,4 +17,8 @@ String.prototype.toBoolean = function () {
 String.prototype.toObjectId = function () {
   const value = String(this.toString());
   return new Types.ObjectId(value);
+};
+
+Array.prototype.toObjectId = function () {
+  return this.map((m: string) => m.toObjectId());
 };

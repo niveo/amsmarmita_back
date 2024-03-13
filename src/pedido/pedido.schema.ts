@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { Comedor } from './comedor.schema';
-import { PedidoPrato } from './pedido-prato.schema';
-import { Marmita } from './marmita.schema';
 import { Type } from 'class-transformer';
+import { Marmita } from '../schemas/marmita.schema';
+import { Comedor } from '../schemas/comedor.schema';
+import { PedidoPrato } from './pedido-prato.schema';
 
 export type PedidoDocument = HydratedDocument<Pedido>;
 

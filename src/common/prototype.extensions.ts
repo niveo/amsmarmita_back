@@ -15,6 +15,8 @@ String.prototype.toBoolean = function () {
 };
 
 String.prototype.toObjectId = function () {
+  console.log('::: toObjectId');
+  
   const value = String(this.toString());
   return new Types.ObjectId(value);
 };

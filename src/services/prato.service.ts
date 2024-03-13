@@ -5,6 +5,7 @@ import { Prato } from '../schemas/prato.schema';
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
 import { Model } from 'mongoose';
+import { cloneMongoDocument } from '../common/utils';
 
 @Injectable()
 export class PratoService implements ServicoInterface {
@@ -30,6 +31,12 @@ export class PratoService implements ServicoInterface {
 
   async delete(id: string): Promise<any> {
     return this.model.deleteOne({ _id: id }).exec();
+  }
+
+  async duplicar(id: any): Promise<any> {
+    const clone = await this.model.findById(id).exec();
+    const createdCat = new this.model(cloneMongoDocument(clone));
+    return createdCat.save();
   }
 
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {

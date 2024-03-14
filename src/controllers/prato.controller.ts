@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { PratoService } from '../services/prato.service';
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
@@ -16,6 +17,11 @@ import { UpdatePratoDto } from '../dtos/update-prato.dto';
 })
 export class PratoController {
   constructor(private readonly service: PratoService) {}
+
+  @Get('duplicar')
+  duplicar(@Query('id') id: string) {
+    return this.service.duplicar(id);
+  }
 
   @Get()
   getAll() {

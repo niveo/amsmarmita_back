@@ -1,11 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type MarmitaDocument = HydratedDocument<Marmita>;
 
-@Schema()
+@Schema({
+  collection: 'marmitas',
+})
 export class Marmita {
-  @Prop()
+  _id: Types.ObjectId;
+
+  @Prop({
+    index: 'asc',
+  })
   lancamento: Date;
 
   @Prop()

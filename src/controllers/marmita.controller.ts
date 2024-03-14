@@ -14,7 +14,7 @@ import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
 @Controller({
   path: 'marmitas',
 })
-export class MarmitasController {
+export class MarmitaController {
   constructor(private readonly service: MarmitaService) {}
 
   @Get()

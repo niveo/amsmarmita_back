@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type ComedoresDocument = HydratedDocument<Comedores>;
+export type ComedorDocument = HydratedDocument<Comedor>;
 
-@Schema()
-export class Comedores {
+@Schema({
+  collection: 'comedores',
+})
+export class Comedor {
   @Prop({
     index: 'asc',
     isRequired: true,
@@ -14,4 +16,4 @@ export class Comedores {
   nome: string;
 }
 
-export const ComedoresSchema = SchemaFactory.createForClass(Comedores);
+export const ComedorSchema = SchemaFactory.createForClass(Comedor);

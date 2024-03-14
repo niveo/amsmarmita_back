@@ -3,7 +3,9 @@ import { HydratedDocument } from 'mongoose';
 
 export type GrupoDocument = HydratedDocument<Grupo>;
 
-@Schema()
+@Schema({
+  collection: 'grupos',
+})
 export class Grupo {
   @Prop({
     index: 'asc',

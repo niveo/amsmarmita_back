@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Prato } from '../schemas/prato.schema';
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
 import { Model } from 'mongoose';
 import { cloneMongoDocument } from '../common/utils';
+import { Prato } from './prato.schema';
 
 @Injectable()
 export class PratoService implements ServicoInterface {
@@ -52,5 +52,12 @@ export class PratoService implements ServicoInterface {
         new: true,
       },
     );
+  }
+
+  async deletePratoId(id: string) {
+    const where = { grupo: id.toObjectId() };
+    const conta = await this.model.where(where).countDocuments().exec();
+    if (conta === 0) return true;
+    return (await this.model.deleteOne(where).exec()).deletedCount > 0;
   }
 }

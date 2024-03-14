@@ -7,10 +7,10 @@ import {
   Post,
   Put,
   Query,
-} from '@nestjs/common';
-import { PratoService } from '../services/prato.service';
+} from '@nestjs/common'; 
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
+import { PratoService } from './prato.service';
 
 @Controller({
   path: 'pratos',

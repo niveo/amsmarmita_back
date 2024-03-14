@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Type } from 'class-transformer';
-import { Prato } from '../schemas/prato.schema';
+import { Prato } from '../prato/prato.schema';
 export type PedidoPratoDocument = HydratedDocument<PedidoPrato>;
 
 @Schema({

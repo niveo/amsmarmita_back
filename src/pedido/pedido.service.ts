@@ -21,6 +21,15 @@ export class PedidoService implements ServicoInterface {
     return this.model.find().exec();
   }
 
+  async findByMamitaId(marmitaId: string, comedorId: string): Promise<Pedido> {
+    return this.model
+      .findOne({
+        marmita: marmitaId.toObjectId(),
+        comedor: comedorId.toObjectId(),
+      })
+      .exec();
+  }
+
   async delete(id: string): Promise<any> {
     return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
   }

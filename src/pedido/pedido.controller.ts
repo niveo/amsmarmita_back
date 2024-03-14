@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { PedidoService } from './pedido.service';
 
@@ -14,6 +15,14 @@ import { PedidoService } from './pedido.service';
 })
 export class PedidoController {
   constructor(private readonly service: PedidoService) {}
+
+  @Get('/marmitas')
+  getByMamitaId(
+    @Query('marmitaId') marmitaId: string,
+    @Query('comedorId') comedorId: string,
+  ) {
+    return this.service.findByMamitaId(marmitaId, comedorId);
+  }
 
   @Get()
   getAll() {

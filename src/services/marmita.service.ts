@@ -24,7 +24,7 @@ export class MarmitaService implements ServicoInterface {
   }
 
   async delete(id: string): Promise<any> {
-    return this.model.deleteOne({ _id: id }).exec();
+    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
   }
 
   async update(id: string, valueDto: UpdateMarmitaDto): Promise<any> {

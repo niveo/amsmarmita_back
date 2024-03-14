@@ -30,7 +30,7 @@ export class PratoService implements ServicoInterface {
   }
 
   async delete(id: string): Promise<any> {
-    return this.model.deleteOne({ _id: id }).exec();
+    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
   }
 
   async duplicar(id: any): Promise<any> {

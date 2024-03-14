@@ -39,12 +39,12 @@ export class PratoController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() valueDto: InsertPratoDto) {
+  update(@Param('id') id: string, @Body() valueDto: UpdatePratoDto) {
     return this.service.update(id, valueDto);
   }
 
   @Post()
-  create(@Body() valueDto: UpdatePratoDto) {
+  create(@Body() valueDto: InsertPratoDto) {
     return this.service.create(valueDto);
   }
 }

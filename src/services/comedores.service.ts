@@ -28,6 +28,8 @@ export class ComedorService implements ServicoInterface {
   }
 
   async update(id: string, valueDto: UpdateComerdoresDto): Promise<any> {
-    return this.model.findByIdAndUpdate({ _id: id }, valueDto).exec();
+    return this.model
+      .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
+      .exec();
   }
 }

@@ -35,10 +35,4 @@ export class PedidoService implements ServicoInterface {
     if (conta === 0) return true;
     return (await this.model.deleteOne(where).exec()).deletedCount > 0;
   }
-
-  async deleteMarmitaIds(ids: string[]): Promise<any> {
-    const where = { marmita: { $in: ids.toObjectId() } };
-    this.model.deleteMany(where).exec();
-    return true;
-  }
 }

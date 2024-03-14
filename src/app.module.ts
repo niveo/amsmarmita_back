@@ -59,18 +59,7 @@ import { PedidoService } from './pedido/pedido.service';
           schema.pre('deleteMany', function (next) {
             const ids = this.getQuery()['_id']['$in'];
             console.log('deleteMany', this.model.name, ids);
-            pedidoService.deleteMarmitaIds(ids).then((ret: boolean) => {
-              if (ret) {
-                next();
-              } else {
-                console.error(
-                  'Não foi possivel excluir os pedidos vinculados a ' +
-                    Marmita.name +
-                    ' ids ' +
-                    ids,
-                );
-              }
-            });
+            next(new Error('Função não implementada'));
           });
           return schema;
         },

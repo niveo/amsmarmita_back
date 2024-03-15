@@ -6,16 +6,23 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
-import { GrupoService } from '../services/grupo.service';
-import { InsertGrupoDto } from '../dtos/insert-grupo.dto';
-import { UpdateGrupoDto } from '../dtos/update-grupo.dto';
+import { PedidoService } from './pedido.service';
 
 @Controller({
-  path: 'grupos',
+  path: 'pedidos',
 })
-export class GrupoController {
-  constructor(private readonly service: GrupoService) {}
+export class PedidoController {
+  constructor(private readonly service: PedidoService) {}
+
+  @Get('/marmitas')
+  getByMamitaId(
+    @Query('marmitaId') marmitaId: string,
+    @Query('comedorId') comedorId: string,
+  ) {
+    return this.service.findByMamitaId(marmitaId, comedorId);
+  }
 
   @Get()
   getAll() {
@@ -33,12 +40,12 @@ export class GrupoController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() valueDto: UpdateGrupoDto) {
+  update(@Param('id') id: string, @Body() valueDto: any) {
     return this.service.update(id, valueDto);
   }
 
   @Post()
-  create(@Body() valueDto: InsertGrupoDto) {
+  create(@Body() valueDto: any) {
     return this.service.create(valueDto);
   }
 }

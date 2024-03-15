@@ -21,8 +21,18 @@ export class PedidoService implements ServicoInterface {
     return this.model.find().exec();
   }
 
+  async findByMamitaId(marmitaId: string, comedorId: string): Promise<Pedido> {
+    return this.model
+      .findOne({
+        marmita: marmitaId.toObjectId(),
+        comedor: comedorId.toObjectId(),
+      })
+      .populate({ path: 'pratos', populate: { path: 'prato' } })
+      .exec();
+  }
+
   async delete(id: string): Promise<any> {
-    return this.model.deleteOne({ _id: id }).exec();
+    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
   }
 
   async update(id: string, valueDto: any): Promise<any> {
@@ -34,11 +44,5 @@ export class PedidoService implements ServicoInterface {
     const conta = await this.model.where(where).countDocuments().exec();
     if (conta === 0) return true;
     return (await this.model.deleteOne(where).exec()).deletedCount > 0;
-  }
-
-  async deleteMarmitaIds(ids: string[]): Promise<any> {
-    const where = { marmita: { $in: ids.toObjectId() } };
-    this.model.deleteMany(where).exec();
-    return true;
   }
 }

@@ -3,9 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PedidoService } from './pedido.service';
 import { Pedido, PedidoSchema } from './pedido.schema';
 import { PedidoPrato, PedidoPratoSchema } from './pedido-prato.schema';
+import { PedidoController } from './pedido.controller';
 
 @Module({
-  controllers: [],
+  controllers: [PedidoController],
   providers: [PedidoService],
   exports: [PedidoService],
   imports: [
@@ -22,7 +23,7 @@ import { PedidoPrato, PedidoPratoSchema } from './pedido-prato.schema';
         },
       },
 
-      //{ name: PedidoPrato.name, useFactory: () => PedidoPratoSchema },
+      { name: PedidoPrato.name, useFactory: () => PedidoPratoSchema },
     ]),
   ],
 })

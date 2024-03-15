@@ -24,10 +24,12 @@ export class MarmitaService implements ServicoInterface {
   }
 
   async delete(id: string): Promise<any> {
-    return this.model.deleteOne({ _id: id }).exec();
+    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
   }
 
   async update(id: string, valueDto: UpdateMarmitaDto): Promise<any> {
-    return this.model.findByIdAndUpdate({ _id: id }, valueDto).exec();
+    return this.model
+      .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
+      .exec();
   }
 }

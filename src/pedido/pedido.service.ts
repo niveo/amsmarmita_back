@@ -27,6 +27,7 @@ export class PedidoService implements ServicoInterface {
         marmita: marmitaId.toObjectId(),
         comedor: comedorId.toObjectId(),
       })
+      .populate({ path: 'pratos', populate: { path: 'prato' } })
       .exec();
   }
 

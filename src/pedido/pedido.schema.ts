@@ -19,9 +19,7 @@ export class Pedido {
   @Type(() => Comedor)
   comedor: Comedor;
 
-  @Prop({
-    type: [{ type: Types.ObjectId, ref: PedidoPrato.name }],
-  })
+  @Prop({ type: [Types.ObjectId], ref: PedidoPrato.name, required: true })
   @Type(() => PedidoPrato)
   pratos: PedidoPrato[];
 }

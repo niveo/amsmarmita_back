@@ -23,7 +23,7 @@ import { PedidoController } from './pedido.controller';
         },
       },
 
-      //{ name: PedidoPrato.name, useFactory: () => PedidoPratoSchema },
+      { name: PedidoPrato.name, useFactory: () => PedidoPratoSchema },
     ]),
   ],
 })

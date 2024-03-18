@@ -8,7 +8,7 @@ import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
 
 @Injectable()
 export class MarmitaService implements ServicoInterface {
-  constructor(@InjectModel(Marmita.name) private model: Model<Marmita>) {}
+  constructor(@InjectModel(Marmita.name) private model: Model<Marmita>) { }
 
   async create(valueDto: InsertMarmitaDto): Promise<Marmita> {
     const createdCat = new this.model(valueDto);
@@ -32,4 +32,25 @@ export class MarmitaService implements ServicoInterface {
       .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
       .exec();
   }
+
+  async carregarPedidoComedor(marmitaId: string, comedorId: string) {
+    const ret = (await this.model.findOne({
+      _id: marmitaId.toObjectId()
+    }).populate({
+      path: 'pedidos', match: {
+        comedor: comedorId.toObjectId()
+      },
+      populate: {
+        path: 'pratos',
+        select: 'quantidade',
+        populate: {
+          path: 'prato',
+          select: 'grupo'
+        }
+      }
+    }).exec())?.pedidos[0];
+    console.log(JSON.stringify(ret))
+    return ret;
+  }
+
 }

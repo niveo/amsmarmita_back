@@ -20,7 +20,9 @@ export class ComedorService implements ServicoInterface {
   }
 
   async findAll(): Promise<Comedor[]> {
-    return this.model.find().exec();
+    const ret = await this.model.find().exec();
+   console.log(ret) 
+    return ret;
   }
 
   async delete(id: string): Promise<any> {

@@ -7,15 +7,15 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { MarmitaService } from '../services/marmita.service';
 import { InsertMarmitaDto } from '../dtos/insert-marmita.dto';
 import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
+import { MarmitaService } from './marmita.service';
 
 @Controller({
   path: 'marmitas',
 })
 export class MarmitaController {
-  constructor(private readonly service: MarmitaService) {}
+  constructor(private readonly service: MarmitaService) { }
 
   @Get()
   getAll() {

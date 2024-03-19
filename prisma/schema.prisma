@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+ 
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model Grupo {
+      id        String    @id @default(auto()) @map("_id") @db.ObjectId
+      nome       String
+      principal  Boolean    @default(false)
+      observacao String?
+
+      @@map("grupos")
+}
+
+model Comedor {
+      id        String    @id @default(auto()) @map("_id") @db.ObjectId
+      nome       String
+//      pedido Pedido?
+      @@map("comedores")
+}
+
+model Marmita {
+      id         String    @id @default(auto()) @map("_id") @db.ObjectId
+      lancamento DateTime
+      observacao String?
+
+      pedidos Pedido[]
+
+      @@map("marmitas")
+      @@index([lancamento])
+}
+
+model Pedido {
+      id        String    @id @default(auto()) @map("_id") @db.ObjectId
+      marmita   Marmita   @relation(fields: [marmitaId], references: [id])
+      marmitaId String @db.ObjectId
+      
+//      comedor Comedor     @relation(fields: [comedorId], references: [id]) 
+//      comedorId String @db.ObjectId
+
+      @@map("pedidos")
+}
+
+model Prato {
+      id        String    @id @default(auto()) @map("_id") @db.ObjectId
+}

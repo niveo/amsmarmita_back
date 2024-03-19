@@ -1,63 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { ServicoInterface } from '../interfaces/servicos.interface';
-import { InjectModel } from '@nestjs/mongoose';
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
-import { Model } from 'mongoose';
-import { cloneMongoDocument } from '../common/utils';
-import { Prato } from './prato.schema';
+import { PrismaService } from '../services/prisma.service';
+import { Prato } from '@prisma/client';
 
 @Injectable()
 export class PratoService implements ServicoInterface {
-  constructor(@InjectModel(Prato.name) private model: Model<Prato>) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(valueDto: InsertPratoDto): Promise<Prato> {
-    const createdCat = new this.model({
-      nome: valueDto.nome,
-      grupo: String(valueDto.grupoId).toObjectId(),
-      composicoes: valueDto.composicoes,
-      observacao: valueDto.observacao,
-    });
-    return createdCat.save();
+    throw new Error('Method not implemented.');
   }
 
   async findById(id: string): Promise<Prato> {
-    return this.model.findById(id).exec();
+    throw new Error('Method not implemented.');
   }
 
   async findAll(): Promise<Prato[]> {
-    return this.model.find().exec();
+    throw new Error('Method not implemented.');
   }
 
   async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
+    throw new Error('Method not implemented.');
   }
 
   async duplicar(id: any): Promise<any> {
-    const clone = await this.model.findById(id).exec();
-    const createdCat = new this.model(cloneMongoDocument(clone));
-    return createdCat.save();
+    throw new Error('Method not implemented.');
   }
 
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {
-    return this.model.findByIdAndUpdate(
-      { _id: id.toObjectId() },
-      {
-        nome: valueDto.nome,
-        grupo: String(valueDto.grupoId).toObjectId(),
-        composicoes: valueDto.composicoes,
-        observacao: valueDto.observacao,
-      },
-      {
-        new: true,
-      },
-    );
+    throw new Error('Method not implemented.');
   }
 
   async deletePratoId(id: string) {
-    const where = { grupo: id.toObjectId() };
-    const conta = await this.model.where(where).countDocuments().exec();
-    if (conta === 0) return true;
-    return (await this.model.deleteOne(where).exec()).deletedCount > 0;
+    throw new Error('Method not implemented.');
   }
 }

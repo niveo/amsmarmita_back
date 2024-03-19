@@ -1,17 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PratoController } from './prato.controller';
 import { PratoService } from './prato.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Prato, PratoSchema } from './prato.schema';
+import { PrismaService } from '../services/prisma.service';
 
 @Module({
   controllers: [PratoController],
-  providers: [PratoService],
+  providers: [PratoService, PrismaService],
   exports: [PratoService],
-  imports: [
-    MongooseModule.forFeatureAsync([
-      { name: Prato.name, useFactory: () => PratoSchema },
-    ]),
-  ],
 })
-export class PratoModule {}
+export class PratoModule { }

@@ -1,37 +1,38 @@
-import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Comedor } from '../schemas/comedor.schema';
 import { UpdateComerdoresDto } from '../dtos/update-comedores.dto';
 import { InsertComerdoresDto } from '../dtos/insert-comedores.dto';
 import { ServicoInterface } from '../interfaces/servicos.interface';
+import { Comedor } from '@prisma/client';
+import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class ComedorService implements ServicoInterface {
-  constructor(@InjectModel(Comedor.name) private model: Model<Comedor>) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(valueDto: InsertComerdoresDto): Promise<Comedor> {
-    const createdCat = new this.model(valueDto);
-    return createdCat.save();
+    return this.prisma.comedor.create({ data: valueDto });
   }
 
   async findById(id: string): Promise<Comedor> {
-    return this.model.findById(id).exec();
+    return this.prisma.comedor.findUnique({
+      where: { id: id },
+    });
   }
 
   async findAll(): Promise<Comedor[]> {
-    const ret = await this.model.find().exec();
-   console.log(ret) 
-    return ret;
+    return this.prisma.comedor.findMany();
   }
 
   async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
+    return this.prisma.comedor.delete({
+      where: { id: id },
+    });
   }
 
   async update(id: string, valueDto: UpdateComerdoresDto): Promise<any> {
-    return this.model
-      .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
-      .exec();
+    return this.prisma.comedor.update({
+      where: { id: id },
+      data: valueDto,
+    });
   }
 }

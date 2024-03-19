@@ -1,35 +1,44 @@
-import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Grupo as GrupoModel, Prisma } from '@prisma/client';
 import { ServicoInterface } from '../interfaces/servicos.interface';
-import { Grupo } from '../schemas/grupo.schema';
-import { InsertGrupoDto } from '../dtos/insert-grupo.dto';
-import { UpdateGrupoDto } from '../dtos/update-grupo.dto';
+import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class GrupoService implements ServicoInterface {
-  constructor(@InjectModel(Grupo.name) private model: Model<Grupo>) {}
+  constructor(private prisma: PrismaService) {}
 
-  async create(valueDto: InsertGrupoDto): Promise<Grupo> {
-    const createdCat = new this.model(valueDto);
-    return createdCat.save();
+  async create(data: Prisma.GrupoCreateInput): Promise<GrupoModel> {
+    return this.prisma.grupo.create({
+      data,
+    });
   }
 
-  async findById(id: string): Promise<Grupo> {
-    return this.model.findById(id).exec();
+  async findById(id: string): Promise<GrupoModel> {
+    return this.prisma.grupo.findUnique({
+      where: {
+        id: id,
+      },
+    });
   }
 
-  async findAll(): Promise<Grupo[]> {
-    return this.model.find().sort({ principal: 'desc', nome: 'asc' }).exec();
+  async findAll(): Promise<GrupoModel[]> {
+    return this.prisma.grupo.findMany({
+      orderBy: [{ principal: 'desc' }, { nome: 'asc' }],
+    });
   }
 
-  async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
+  async delete(id: string): Promise<GrupoModel> {
+    return this.prisma.grupo.delete({
+      where: { id: id },
+    });
   }
 
-  async update(id: string, valueDto: UpdateGrupoDto): Promise<any> {
-    return this.model
-      .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
-      .exec();
+  async update(id: string, data: Prisma.GrupoUpdateInput): Promise<GrupoModel> {
+    return this.prisma.grupo.update({
+      data: data,
+      where: {
+        id: id,
+      },
+    });
   }
 }

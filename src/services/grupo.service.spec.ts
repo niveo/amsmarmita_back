@@ -6,8 +6,7 @@ describe('GrupoService', () => {
   let grupoService: GrupoService;
 
   beforeAll(async () => {
-   
-    process.env.DATABASE_URL="mongodb://ams:sapphire@192.168.0.129:27017/marmitadbteste?eplicaSet=rs0";
+    //process.env.DATABASE_URL="mongodb://ams:sapphire@192.168.0.129:27017/marmitadbteste?eplicaSet=rs0";
 
     const app: TestingModule = await Test.createTestingModule({
       imports: [],
@@ -31,7 +30,9 @@ describe('GrupoService', () => {
       const { nome } = registro;
       expect(nome).toEqual('Teste');
 
-      const registroUpdate = await grupoService.update(registro.id, {nome: 'Teste 2'})
+      const registroUpdate = await grupoService.update(registro.id, {
+        nome: 'Teste 2',
+      });
       expect(registroUpdate.nome).toEqual('Teste 2');
 
       const registroFind = await grupoService.findById(registro.id);

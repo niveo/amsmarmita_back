@@ -6,6 +6,9 @@ describe('GrupoService', () => {
   let grupoService: GrupoService;
 
   beforeAll(async () => {
+   
+    process.env.DATABASE_URL="mongodb://ams:sapphire@192.168.0.129:27017/marmitadbteste?eplicaSet=rs0";
+
     const app: TestingModule = await Test.createTestingModule({
       imports: [],
       providers: [GrupoService, PrismaService],
@@ -18,7 +21,7 @@ describe('GrupoService', () => {
     expect(grupoService).toBeDefined();
   });
 
-  describe('Salvar Grupoo', () => {
+  describe('Salvar Grupo', () => {
     it('Tem que retornar objeto salvo', async () => {
       const registro = await grupoService.create({
         nome: 'Teste',
@@ -28,8 +31,13 @@ describe('GrupoService', () => {
       const { nome } = registro;
       expect(nome).toEqual('Teste');
 
-      const removido = await grupoService.delete(registro.id);
-      expect(removido).not.toBeNull();
+      const registroUpdate = await grupoService.update(registro.id, {nome: 'Teste 2'})
+      expect(registroUpdate.nome).toEqual('Teste 2');
+
+      const registroFind = await grupoService.findById(registro.id);
+      expect(registroFind).not.toBeNull();
+
+      await grupoService.delete(registro.id);
     });
   });
 });

@@ -8,6 +8,8 @@ export type PratoDocument = HydratedDocument<Prato>;
   collection: 'pratos',
 })
 export class Prato {
+  _id: Types.ObjectId;
+
   @Prop({
     index: 'asc',
     isRequired: true,

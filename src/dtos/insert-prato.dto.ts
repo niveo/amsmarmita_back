@@ -5,9 +5,9 @@ export class InsertPratoDto {
   nome: string;
 
   @IsNotEmpty()
-  grupoId: string;
+  grupoId?: string;
 
-  composicoes: string[];
+  composicoes?: string[];
 
-  observacao: string;
+  observacao?: string;
 }

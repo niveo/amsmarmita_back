@@ -5,4 +5,6 @@ export class InsertGrupoDto {
   nome: string;
 
   observacao?: string;
+
+  principal?: boolean = false;
 }

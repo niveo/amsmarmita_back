@@ -12,12 +12,7 @@ export class PratoService implements ServicoInterface {
   constructor(@InjectModel(Prato.name) private model: Model<Prato>) {}
 
   async create(valueDto: InsertPratoDto): Promise<Prato> {
-    const createdCat = new this.model({
-      nome: valueDto.nome,
-      grupo: String(valueDto.grupoId).toObjectId(),
-      composicoes: valueDto.composicoes,
-      observacao: valueDto.observacao,
-    });
+    const createdCat = new this.model(valueDto);
     return createdCat.save();
   }
 
@@ -40,18 +35,9 @@ export class PratoService implements ServicoInterface {
   }
 
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {
-    return this.model.findByIdAndUpdate(
-      { _id: id.toObjectId() },
-      {
-        nome: valueDto.nome,
-        grupo: String(valueDto.grupoId).toObjectId(),
-        composicoes: valueDto.composicoes,
-        observacao: valueDto.observacao,
-      },
-      {
-        new: true,
-      },
-    );
+    return this.model.findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
+      new: true,
+    });
   }
 
   async deletePratoId(id: string) {

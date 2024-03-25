@@ -20,60 +20,34 @@ describe('GrupoService', () => {
     expect(grupoService).toBeDefined();
   });
 
-  describe('Salvar Grupo', () => {
-    it('Tem que retornar objeto salvo', async () => {
+  describe('Processo CRUD', () => {
+    let registroId: any;
+    it('Verificar registro e nome do registro criado', async () => {
       const registro = await grupoService.create({
         nome: 'Teste',
         observacao: 'Teste',
         principal: false,
       });
+      expect(registro).not.toBeNull();
+      registroId = registro._id;
       const { nome } = registro;
       expect(nome).toEqual('Teste');
     });
-  });
 
-  describe('Atualizar Grupo', () => {
-    it('Tem que retornar objeto salvo', async () => {
-      const registro = await grupoService.create({
-        nome: 'Teste',
-        observacao: 'Teste',
-        principal: false,
+    it('Atualizar nome do registro', async () => {
+      const registroUpdate = await grupoService.update(registroId.toString(), {
+        nome: 'Teste 2',
       });
-      const { nome } = registro;
-      expect(nome).toEqual('Teste');
-
-      const registroUpdate = await grupoService.update(
-        registro._id.toString(),
-        {
-          nome: 'Teste 2',
-        },
-      );
       expect(registroUpdate.nome).toEqual('Teste 2');
     });
-  });
 
-  describe('Remover Grupo', () => {
-    it('Tem que retornar objeto salvo', async () => {
-      const registro = await grupoService.create({
-        nome: 'Teste',
-        observacao: 'Teste',
-        principal: false,
-      });
-
-      await grupoService.delete(registro._id.toString());
-    });
-  });
-
-  describe('Pesquisar Grupo', () => {
-    it('Tem que retornar objeto salvo', async () => {
-      const registro = await grupoService.create({
-        nome: 'Teste',
-        observacao: 'Teste',
-        principal: false,
-      });
-
-      const registroFind = await grupoService.findById(registro._id.toString());
+    it('Registro pesquisado não pode ser nulo', async () => {
+      const registroFind = await grupoService.findById(registroId.toString());
       expect(registroFind).not.toBeNull();
+    });
+
+    it('Remover registro', async () => {
+      await grupoService.delete(registroId.toString());
     });
   });
 });

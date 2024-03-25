@@ -1,8 +1,3 @@
-import { IsNotEmpty } from 'class-validator';
+import { InsertGrupoDto } from './insert-grupo.dto';
 
-export class UpdateGrupoDto {
-  @IsNotEmpty()
-  nome: string;
-  observacao?: string;
-  principal?: boolean = false;
-}
+export class UpdateGrupoDto extends InsertGrupoDto {}

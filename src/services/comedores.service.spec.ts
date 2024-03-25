@@ -1,45 +1,54 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ComedorService } from './comedores.service';
 import { RootModule } from '../root.module';
+import { ComedorService } from './comedores.service';
 
-describe('ComedoresService', () => {
-  let comedoresService: ComedorService;
+describe('ComedorService', () => {
+  let comedorService: ComedorService;
 
   beforeAll(async () => {
+    //process.env.DATABASE_URL="mongodb://ams:sapphire@192.168.0.129:27017/marmitadbteste?eplicaSet=rs0";
+
     const app: TestingModule = await Test.createTestingModule({
       imports: [RootModule],
       providers: [ComedorService],
     }).compile();
 
-    comedoresService = app.get<ComedorService>(ComedorService);
+    comedorService = app.get<ComedorService>(ComedorService);
   });
 
   it('should be defined', () => {
-    expect(comedoresService).toBeDefined();
+    expect(comedorService).toBeDefined();
   });
 
-  describe('Salvar Comedor', () => {
-    it('Tem que retornar objeto salvo', async () => {
-      const registro = await comedoresService.create({
+  describe('Processo CRUD', () => {
+    let registroId: any;
+    it('Verificar registro e nome do registro criado', async () => {
+      const registro = await comedorService.create({
         nome: 'Teste',
       });
+      expect(registro).not.toBeNull();
+      registroId = registro._id;
       const { nome } = registro;
       expect(nome).toEqual('Teste');
+    });
 
-      const registroUpdate = await comedoresService.update(
-        registro._id.toString(),
+    it('Atualizar nome do registro', async () => {
+      const registroUpdate = await comedorService.update(
+        registroId.toString(),
         {
           nome: 'Teste 2',
         },
       );
       expect(registroUpdate.nome).toEqual('Teste 2');
+    });
 
-      const registroFind = await comedoresService.findById(
-        registro._id.toString(),
-      );
+    it('Registro pesquisado não pode ser nulo', async () => {
+      const registroFind = await comedorService.findById(registroId.toString());
       expect(registroFind).not.toBeNull();
+    });
 
-      await comedoresService.delete(registro._id.toString());
+    it('Remover registro', async () => {
+      await comedorService.delete(registroId.toString());
     });
   });
 });

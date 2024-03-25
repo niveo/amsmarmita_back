@@ -1,13 +1,3 @@
-import { IsNotEmpty } from 'class-validator';
+import { InsertPratoDto } from './insert-prato.dto';
 
-export class UpdatePratoDto {
-  @IsNotEmpty()
-  nome: string;
-
-  @IsNotEmpty()
-  grupoId?: string;
-
-  composicoes?: string[];
-
-  observacao?: string;
-}
+export class UpdatePratoDto extends InsertPratoDto {}

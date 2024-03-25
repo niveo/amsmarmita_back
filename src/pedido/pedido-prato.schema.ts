@@ -11,7 +11,11 @@ export type PedidoPratoDocument = HydratedDocument<PedidoPrato>;
 export class PedidoPrato {
   _id: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: Prato.name })
+  @Prop({ type: Types.ObjectId, ref: 'Pedido', required: true })
+  @Type(() => Pedido)
+  pedido: Pedido;
+
+  @Prop({ type: Types.ObjectId, ref: Prato.name, required: true })
   @Type(() => Prato)
   prato: Prato;
 
@@ -23,3 +27,10 @@ export class PedidoPrato {
 }
 
 export const PedidoPratoSchema = SchemaFactory.createForClass(PedidoPrato);
+
+PedidoPratoSchema.index(
+  { prato: 'asc', pedido: 'asc' },
+  {
+    unique: true,
+  },
+);

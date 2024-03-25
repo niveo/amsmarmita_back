@@ -29,10 +29,9 @@ export class MarmitaService implements ServicoInterface {
     return this.model.find().exec();
   }
 
-  async delete(id: string): Promise<number> {
+  async delete(id: string): Promise<boolean> {
     const transactionSession = await this.connection.startSession();
     transactionSession.startTransaction();
-
     try {
       if (await this.pedidoService.deleteMarmitaId(id, transactionSession)) {
         const deletedCount = (
@@ -42,7 +41,7 @@ export class MarmitaService implements ServicoInterface {
             .exec()
         ).deletedCount;
         await transactionSession.commitTransaction();
-        return deletedCount;
+        return deletedCount > 0;
       } else {
         throw 'Não foi possivel remover pedidos vinculados a essa marmita';
       }
@@ -59,31 +58,5 @@ export class MarmitaService implements ServicoInterface {
     return this.model
       .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
       .exec();
-  }
-
-  async carregarPedidoComedor(marmitaId: string, comedorId: string) {
-    const ret = (
-      await this.model
-        .findOne({
-          _id: marmitaId.toObjectId(),
-        })
-        .populate({
-          path: 'pedidos',
-          match: {
-            comedor: comedorId.toObjectId(),
-          },
-          populate: {
-            path: 'pratos',
-            select: 'quantidade',
-            populate: {
-              path: 'prato',
-              select: 'grupo',
-            },
-          },
-        })
-        .exec()
-    )?.pedidos[0];
-    console.log(JSON.stringify(ret));
-    return ret;
   }
 }

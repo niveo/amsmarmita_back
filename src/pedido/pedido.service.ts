@@ -1,17 +1,15 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Connection, Model } from 'mongoose';
 import { Pedido } from './pedido.schema';
-import { MarmitaService } from '../marmita/marmita.service';
 import { PedidoPratoService } from './pedido-prato.service';
+import { PedidoPrato } from './pedido-prato.schema';
 
 @Injectable()
 export class PedidoService implements ServicoInterface {
   constructor(
     @InjectModel(Pedido.name) private model: Model<Pedido>,
-    @Inject(forwardRef(() => MarmitaService))
-    private readonly marmitaService: MarmitaService,
     private readonly pedidoPratoService: PedidoPratoService,
     @InjectConnection() private connection: Connection,
   ) {}
@@ -29,16 +27,51 @@ export class PedidoService implements ServicoInterface {
     return this.model.find().exec();
   }
 
-  async findByMamitaId(marmitaId: string, comedorId: string) {
-    return this.marmitaService.carregarPedidoComedor(marmitaId, comedorId);
+  async carregarPedidoPratos(
+    marmitaId: string,
+    comedorId: string,
+  ): Promise<{ pedido: Pedido; pratos: PedidoPrato[] }> {
+    const registro = await this.model
+      .findOne({
+        marmita: marmitaId.toObjectId(),
+        comedor: comedorId.toObjectId(),
+      })
+      .select(['comedor', 'marmita', '_id'])
+      .exec();
+
+    const pratos = await this.pedidoPratoService.carregarPedidoPratos(
+      registro._id.toString(),
+    );
+
+    return { pedido: registro, pratos: pratos };
   }
 
-  async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
+  async delete(id: string): Promise<boolean> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      this.pedidoPratoService.deletePedidoId(id, session);
+
+      const deletedCount = (
+        await this.model.deleteOne({ _id: id }).session(session).exec()
+      ).deletedCount;
+
+      session.commitTransaction();
+
+      return deletedCount > 0;
+    } catch (e) {
+      session.abortTransaction();
+    } finally {
+      session.endSession();
+    }
   }
 
   async update(id: string, valueDto: any): Promise<any> {
-    return this.model.findByIdAndUpdate({ _id: id }, {}).exec();
+    return this.model
+      .findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
+        new: true,
+      })
+      .exec();
   }
 
   async deleteMarmitaId(id: string, session: ClientSession): Promise<any> {
@@ -53,25 +86,5 @@ export class PedidoService implements ServicoInterface {
       (await this.model.deleteOne(where).session(session).exec()).deletedCount >
       0
     );
-  }
-
-  async deletePratoId(pedidoId: string, pratoId: string) {
-    const session = await this.connection.startSession();
-    session.startTransaction();
-    try {
-      this.pedidoPratoService.deletePrato(pratoId, session);
-      const pedido = await this.findById(pedidoId);
-      const index = pedido.pratos.findIndex((p) => p._id);
-      delete pedido.pratos[index];
-
-      await this.model.updateOne(
-        { _id: pedidoId.toObjectId() },
-        { pratos: pedido.pratos },
-      );
-    } catch (e) {
-      session.abortTransaction();
-    } finally {
-      session.endSession();
-    }
   }
 }

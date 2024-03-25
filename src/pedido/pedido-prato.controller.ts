@@ -6,27 +6,14 @@ import {
   Param,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
-import { PedidoService } from './pedido.service';
 import { PedidoPratoService } from './pedido-prato.service';
 
 @Controller({
-  path: 'pedidos',
+  path: 'pedidopratos',
 })
-export class PedidoController {
-  constructor(
-    private readonly service: PedidoService,
-    private readonly servicePedidoPrato: PedidoPratoService,
-  ) {}
-
-  @Get('/marmitas')
-  getByMamitaId(
-    @Query('marmitaId') marmitaId: string,
-    @Query('comedorId') comedorId: string,
-  ) {
-    return this.service.carregarPedidoPratos(marmitaId, comedorId);
-  }
+export class PedidoPratoController {
+  constructor(private readonly service: PedidoPratoService) {}
 
   @Get()
   getAll() {

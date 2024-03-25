@@ -6,36 +6,25 @@ import { PedidoPrato, PedidoPratoSchema } from './pedido-prato.schema';
 import { PedidoController } from './pedido.controller';
 import { MarmitaModule } from '../marmita/marmita.module';
 import { PedidoPratoService } from './pedido-prato.service';
+import { PedidoPratoController } from './pedido-prato.controller';
 
 @Module({
-  controllers: [PedidoController],
+  controllers: [PedidoController, PedidoPratoController],
   providers: [PedidoService, PedidoPratoService],
   exports: [PedidoService],
   imports: [
     forwardRef(() => MarmitaModule),
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: Pedido.name,
-        useFactory: () => {
-          const schema = PedidoSchema;
-          schema.pre('save', function() {
-            console.log('Hello from pre save');
-          });
-
-          return schema;
-        },
+        schema: PedidoSchema,
       },
 
       {
-        name: PedidoPrato.name, useFactory: (pedidoService: PedidoService) => {
-          const schema = PedidoPratoSchema;
-          schema.pre('deleteOne', function(next) {
-
-          });
-          return schema;
-        },
-      }
+        name: PedidoPrato.name,
+        schema: PedidoPratoSchema,
+      },
     ]),
   ],
 })
-export class PedidoModule { }
+export class PedidoModule {}

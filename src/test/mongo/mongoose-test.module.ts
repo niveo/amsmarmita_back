@@ -1,13 +1,18 @@
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import '../../common/prototype.extensions';
 
-let mongod: MongoMemoryServer;
+let mongod: MongoMemoryReplSet;
 
+/**
+ * @param options
+ * @returns
+ * Teste com transação só funciona com MongoMemoryReplSet
+ */
 export const rootMongooseTestModule = (options: MongooseModuleOptions = {}) =>
   MongooseModule.forRootAsync({
     useFactory: async () => {
-      mongod = await MongoMemoryServer.create();
+      mongod = await MongoMemoryReplSet.create();
       const mongoUri = mongod.getUri();
       return {
         uri: mongoUri,

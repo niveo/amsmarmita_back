@@ -3,7 +3,7 @@ import { ServicoInterface } from '../interfaces/servicos.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
-import { Model } from 'mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { cloneMongoDocument } from '../common/utils';
 import { Prato } from './prato.schema';
 
@@ -12,7 +12,11 @@ export class PratoService implements ServicoInterface {
   constructor(@InjectModel(Prato.name) private model: Model<Prato>) {}
 
   async create(valueDto: InsertPratoDto): Promise<Prato> {
-    const createdCat = new this.model(valueDto);
+    const data: any = {
+      ...valueDto,
+      grupo: valueDto.grupo.toObjectId(),
+    };
+    const createdCat = new this.model(data);
     return createdCat.save();
   }
 
@@ -25,7 +29,8 @@ export class PratoService implements ServicoInterface {
   }
 
   async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
+    return (await this.model.deleteOne({ _id: id.toObjectId() }).exec())
+      .deletedCount;
   }
 
   async duplicar(id: any): Promise<any> {
@@ -40,10 +45,20 @@ export class PratoService implements ServicoInterface {
     });
   }
 
-  async deletePratoId(id: string) {
+  async deletePratoId(id: string, transactionSession: ClientSession) {
     const where = { grupo: id.toObjectId() };
-    const conta = await this.model.where(where).countDocuments().exec();
-    if (conta === 0) return true;
-    return (await this.model.deleteOne(where).exec()).deletedCount > 0;
+    const conta = await this.model
+      .where(where)
+      .countDocuments()
+      .session(transactionSession)
+      .exec();
+    if (conta === 0) {
+      console.info('Não existe pratos vinculados a esse filtro', where);
+      return true;
+    }
+    return (
+      (await this.model.deleteOne(where).session(transactionSession).exec())
+        .deletedCount > 0
+    );
   }
 }

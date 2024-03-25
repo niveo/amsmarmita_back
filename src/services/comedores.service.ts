@@ -24,7 +24,7 @@ export class ComedorService implements ServicoInterface {
   }
 
   async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
+    return (await this.model.deleteOne({ _id: id.toObjectId() }).exec()).deletedCount;
   }
 
   async update(id: string, valueDto: UpdateComerdoresDto): Promise<any> {

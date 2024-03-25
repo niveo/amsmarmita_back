@@ -14,5 +14,5 @@ export class InsertMarmitaDto {
   @IsString()
   @IsOptional()
   @Length(0, 100)
-  observacao: string;
+  observacao?: string;
 }

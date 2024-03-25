@@ -9,11 +9,6 @@ export type PedidoPratoDocument = HydratedDocument<PedidoPrato>;
   collection: 'pedidos_pratos',
 })
 export class PedidoPrato {
-  /*   @Prop({ type: Types.ObjectId, ref: Pedido.name })
-    @Type(() => Pedido)
-    pedido: Pedido; */
-
-
   _id: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: Prato.name })

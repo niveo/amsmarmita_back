@@ -46,8 +46,6 @@ export class GrupoService implements ServicoInterface {
         throw 'Não foi possivel remover pratos vinculados a esse grupo';
       }
     } catch (e) {
-      console.log((await this.pratoService.findAll()).length);
-
       console.info('Abortando transação');
       await transactionSession.abortTransaction();
       throw e;

@@ -28,9 +28,9 @@ export class PratoService implements ServicoInterface {
     return this.model.find().exec();
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(id: string): Promise<boolean> {
     return (await this.model.deleteOne({ _id: id.toObjectId() }).exec())
-      .deletedCount;
+      .deletedCount > 0;
   }
 
   async duplicar(id: any): Promise<any> {

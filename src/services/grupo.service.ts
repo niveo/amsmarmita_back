@@ -28,7 +28,7 @@ export class GrupoService implements ServicoInterface {
     return this.model.find().sort({ principal: 'desc', nome: 'asc' }).exec();
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(id: string): Promise<boolean> {
     const transactionSession = await this.connection.startSession();
     transactionSession.startTransaction();
 
@@ -41,7 +41,7 @@ export class GrupoService implements ServicoInterface {
             .exec()
         ).deletedCount;
         await transactionSession.commitTransaction();
-        return deletedCount;
+        return deletedCount > 0;
       } else {
         throw 'Não foi possivel remover pratos vinculados a esse grupo';
       }

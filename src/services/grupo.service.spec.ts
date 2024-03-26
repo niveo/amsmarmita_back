@@ -9,7 +9,7 @@ import { PratoModule } from '../prato/prato.module';
 import { Grupo, GrupoSchema } from '../schemas/grupo.schema';
 
 describe('GrupoService', () => {
-  let grupoService: GrupoService;
+  let service: GrupoService;
 
   beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -20,17 +20,17 @@ describe('GrupoService', () => {
       ],
       providers: [GrupoService],
     }).compile();
-    grupoService = app.get<GrupoService>(GrupoService);
+    service = app.get<GrupoService>(GrupoService);
   });
 
   it('should be defined', () => {
-    expect(grupoService).toBeDefined();
+    expect(service).toBeDefined();
   });
 
   describe('Processo CRUD', () => {
     let registroId: string;
     it('Verificar registro e nome do registro criado', async () => {
-      const registro = await grupoService.create({
+      const registro = await service.create({
         nome: 'Teste',
         observacao: 'Teste',
         principal: false,
@@ -42,25 +42,25 @@ describe('GrupoService', () => {
     });
 
     it('Atualizar nome do registro', async () => {
-      const registroUpdate = await grupoService.update(registroId, {
+      const registroUpdate = await service.update(registroId, {
         nome: 'Teste 2',
       });
       expect(registroUpdate.nome).toEqual('Teste 2');
     });
 
     it('Registro não pode ser nulo', async () => {
-      const registroFind = await grupoService.findById(registroId);
+      const registroFind = await service.findById(registroId);
       expect(registroFind).not.toBeNull();
     });
 
     it('Deve retornar um registro', async () => {
-      const registros = await grupoService.findAll();
+      const registros = await service.findAll();
       expect(registros).toHaveLength(1);
     });
 
     it('Deve retornar um registro removido', async () => {
-      const removidos = await grupoService.delete(registroId);
-      expect(removidos).toEqual(1);
+      const removidos = await service.delete(registroId);
+      expect(removidos).toEqual(true);
     });
   });
 

@@ -61,7 +61,7 @@ describe('PratoGrupoTest', () => {
 
   it('Deve remover grupo e pratos em cascade', async () => {
     const removidos = await grupoService.delete(grupoId);
-    expect(removidos).toEqual(1);
+    expect(removidos).toEqual(true);
 
     const pratoRegistro = await pratoService.findById(pratoId);
     expect(pratoRegistro).toBeNull();

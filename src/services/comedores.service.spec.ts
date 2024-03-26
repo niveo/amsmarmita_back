@@ -8,7 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Comedor, ComedorSchema } from '../schemas/comedor.schema';
 
 describe('ComedorService', () => {
-  let comedorService: ComedorService;
+  let service: ComedorService;
 
   beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -20,17 +20,17 @@ describe('ComedorService', () => {
       ],
       providers: [ComedorService],
     }).compile();
-    comedorService = app.get<ComedorService>(ComedorService);
+    service = app.get<ComedorService>(ComedorService);
   });
 
   it('should be defined', () => {
-    expect(comedorService).toBeDefined();
+    expect(service).toBeDefined();
   });
 
   describe('Processo CRUD', () => {
     let registroId: string;
     it('Verificar registro e nome do registro criado', async () => {
-      const registro = await comedorService.create({
+      const registro = await service.create({
         nome: 'Teste',
       });
       expect(registro).not.toBeNull();
@@ -40,25 +40,25 @@ describe('ComedorService', () => {
     });
 
     it('Atualizar nome do registro', async () => {
-      const registroUpdate = await comedorService.update(registroId, {
+      const registroUpdate = await service.update(registroId, {
         nome: 'Teste 2',
       });
       expect(registroUpdate.nome).toEqual('Teste 2');
     });
 
     it('Registro não pode ser nulo', async () => {
-      const registroFind = await comedorService.findById(registroId);
+      const registroFind = await service.findById(registroId);
       expect(registroFind).not.toBeNull();
     });
 
     it('Deve retornar um registro', async () => {
-      const registros = await comedorService.findAll();
+      const registros = await service.findAll();
       expect(registros).toHaveLength(1);
     });
 
     it('Deve retornar um registro removido', async () => {
-      const removidos = await comedorService.delete(registroId);
-      expect(removidos).toEqual(1);
+      const removidos = await service.delete(registroId);
+      expect(removidos).toEqual(true);
     });
   });
 

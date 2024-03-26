@@ -12,7 +12,7 @@ export class PedidoService implements ServicoInterface {
     @InjectModel(Pedido.name) private model: Model<Pedido>,
     private readonly pedidoPratoService: PedidoPratoService,
     @InjectConnection() private connection: Connection,
-  ) {}
+  ) { }
 
   async create(valueDto: any): Promise<Pedido> {
     const createdCat = new this.model(valueDto);
@@ -39,9 +39,15 @@ export class PedidoService implements ServicoInterface {
       .select(['comedor', 'marmita', '_id'])
       .exec();
 
-    const pratos = await this.pedidoPratoService.carregarPedidoPratos(
+    const pratos = (await this.pedidoPratoService.carregarPedidoPratos(
       registro._id.toString(),
-    );
+    ))?.sort((a, b) => {
+
+      if (a.prato.nome < b.prato.nome) return -1;
+      if (a.prato.nome > b.prato.nome) return 1;
+      return 0;
+
+    })
 
     return { pedido: registro, pratos: pratos };
   }

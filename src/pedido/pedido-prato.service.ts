@@ -10,15 +10,15 @@ import { InsertPedidoPratoDto } from '../dtos/insert-pedido-prato.dto';
 export class PedidoPratoService implements ServicoInterface {
   constructor(
     @InjectModel(PedidoPrato.name) private model: Model<PedidoPrato>,
-  ) {}
+  ) { }
 
-  async create(valueDto: InsertPedidoPratoDto): Promise<string> {
+  async create(valueDto: InsertPedidoPratoDto): Promise<PedidoPrato> {
     const createdCat = new this.model({
       pedido: valueDto.pedido.toObjectId(),
       prato: valueDto.prato.toObjectId(),
       quantidade: valueDto.quantidade,
     });
-    return (await createdCat.save())._id.toString();
+    return (await createdCat.save()).populate('prato', 'grupo nome');
   }
 
   findById(id: string): Promise<any> {
@@ -44,8 +44,10 @@ export class PedidoPratoService implements ServicoInterface {
   async carregarPedidoPratos(pedidoId: string) {
     return this.model.find({ pedido: pedidoId.toObjectId() }).populate({
       path: 'prato',
-      select: 'grupo',
-    });
+      select: ['grupo', 'nome'],
+      //match: { nome: 'Frango Cozido' },
+      //options: { sort: { '_id': 'asc' } }
+    })//.sort({'prato.nome': 1});
   }
 
   deletePedidoId(id: string, session: ClientSession) {

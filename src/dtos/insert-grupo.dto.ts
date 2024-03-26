@@ -20,4 +20,8 @@ export class InsertGrupoDto {
   @IsBoolean()
   @IsNotEmpty()
   principal?: boolean = false;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  multiplo?: boolean = false;
 }

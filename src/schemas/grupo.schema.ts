@@ -24,6 +24,12 @@ export class Grupo {
   principal: boolean = false;
 
   @Prop({
+    isRequired: true,
+    default: false
+  })
+  multiplo: boolean = false;
+
+  @Prop({
     max: 100,
     maxlength: 100,
   })

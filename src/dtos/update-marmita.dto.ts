@@ -1,4 +1,3 @@
-export class UpdateMarmitaDto {
-  lancamento: Date;
-  observacao: string;
-}
+import { InsertMarmitaDto } from './insert-marmita.dto';
+
+export class UpdateMarmitaDto extends InsertMarmitaDto {}

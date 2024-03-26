@@ -3,7 +3,7 @@ import { ServicoInterface } from '../interfaces/servicos.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
-import { Model } from 'mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { cloneMongoDocument } from '../common/utils';
 import { Prato } from './prato.schema';
 
@@ -12,12 +12,11 @@ export class PratoService implements ServicoInterface {
   constructor(@InjectModel(Prato.name) private model: Model<Prato>) {}
 
   async create(valueDto: InsertPratoDto): Promise<Prato> {
-    const createdCat = new this.model({
-      nome: valueDto.nome,
-      grupo: String(valueDto.grupoId).toObjectId(),
-      composicoes: valueDto.composicoes,
-      observacao: valueDto.observacao,
-    });
+    const data: any = {
+      ...valueDto,
+      grupo: valueDto.grupo.toObjectId(),
+    };
+    const createdCat = new this.model(data);
     return createdCat.save();
   }
 
@@ -29,8 +28,9 @@ export class PratoService implements ServicoInterface {
     return this.model.find().exec();
   }
 
-  async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount;
+  async delete(id: string): Promise<boolean> {
+    return (await this.model.deleteOne({ _id: id.toObjectId() }).exec())
+      .deletedCount > 0;
   }
 
   async duplicar(id: any): Promise<any> {
@@ -40,24 +40,32 @@ export class PratoService implements ServicoInterface {
   }
 
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {
-    return this.model.findByIdAndUpdate(
-      { _id: id.toObjectId() },
-      {
-        nome: valueDto.nome,
-        grupo: String(valueDto.grupoId).toObjectId(),
-        composicoes: valueDto.composicoes,
-        observacao: valueDto.observacao,
-      },
-      {
-        new: true,
-      },
-    );
+    return this.model.findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
+      new: true,
+    });
   }
 
-  async deletePratoId(id: string) {
-    const where = { grupo: id.toObjectId() };
-    const conta = await this.model.where(where).countDocuments().exec();
-    if (conta === 0) return true;
-    return (await this.model.deleteOne(where).exec()).deletedCount > 0;
+  /**
+   * 
+   * @param grupoId 
+   * @param transactionSession 
+   * @returns 
+   * Remove todos os pratos vinculados com o grupo
+   */
+  async removerPratosGrupoId(grupoId: string, transactionSession: ClientSession) {
+    const where = { grupo: grupoId.toObjectId() };
+    const conta = await this.model
+      .where(where)
+      .countDocuments()
+      .session(transactionSession)
+      .exec();
+    if (conta === 0) {
+      console.info('Não existe pratos vinculados a esse filtro', where);
+      return true;
+    }
+    return (
+      (await this.model.deleteOne(where).session(transactionSession).exec())
+        .deletedCount > 0
+    );
   }
 }

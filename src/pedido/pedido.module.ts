@@ -1,29 +1,29 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PedidoService } from './pedido.service';
 import { Pedido, PedidoSchema } from './pedido.schema';
 import { PedidoPrato, PedidoPratoSchema } from './pedido-prato.schema';
 import { PedidoController } from './pedido.controller';
+import { MarmitaModule } from '../marmita/marmita.module';
+import { PedidoPratoService } from './pedido-prato.service';
+import { PedidoPratoController } from './pedido-prato.controller';
 
 @Module({
-  controllers: [PedidoController],
-  providers: [PedidoService],
+  controllers: [PedidoController, PedidoPratoController],
+  providers: [PedidoService, PedidoPratoService],
   exports: [PedidoService],
   imports: [
-    MongooseModule.forFeatureAsync([
+    forwardRef(() => MarmitaModule),
+    MongooseModule.forFeature([
       {
         name: Pedido.name,
-        useFactory: () => {
-          const schema = PedidoSchema;
-          schema.pre('save', function () {
-            console.log('Hello from pre save');
-          });
-
-          return schema;
-        },
+        schema: PedidoSchema,
       },
 
-      { name: PedidoPrato.name, useFactory: () => PedidoPratoSchema },
+      {
+        name: PedidoPrato.name,
+        schema: PedidoPratoSchema,
+      },
     ]),
   ],
 })

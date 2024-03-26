@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type GrupoDocument = HydratedDocument<Grupo>;
 
@@ -7,6 +7,8 @@ export type GrupoDocument = HydratedDocument<Grupo>;
   collection: 'grupos',
 })
 export class Grupo {
+  _id: Types.ObjectId;
+
   @Prop({
     index: 'asc',
     isRequired: true,

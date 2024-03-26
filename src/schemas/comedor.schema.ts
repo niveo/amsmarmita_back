@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type ComedorDocument = HydratedDocument<Comedor>;
 
@@ -7,6 +7,7 @@ export type ComedorDocument = HydratedDocument<Comedor>;
   collection: 'comedores',
 })
 export class Comedor {
+  _id: Types.ObjectId;
   @Prop({
     index: 'asc',
     isRequired: true,

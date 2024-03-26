@@ -9,9 +9,7 @@ import { Prato, PratoSchema } from './prato.schema';
   providers: [PratoService],
   exports: [PratoService],
   imports: [
-    MongooseModule.forFeatureAsync([
-      { name: Prato.name, useFactory: () => PratoSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Prato.name, schema: PratoSchema }]),
   ],
 })
 export class PratoModule {}

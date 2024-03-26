@@ -1,39 +1,39 @@
 import mongoose, { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ServicoInterface } from '../interfaces/servicos.interface';
-import { Grupo } from '../schemas/grupo.schema';
-import { InsertGrupoDto } from '../dtos/insert-grupo.dto';
-import { UpdateGrupoDto } from '../dtos/update-grupo.dto';
-import { PratoService } from '../prato/prato.service';
+import { Marmita } from './marmita.schema';
+import { InsertMarmitaDto } from '../dtos/insert-marmita.dto';
+import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
+import { PedidoService } from '../pedido/pedido.service';
 
 @Injectable()
-export class GrupoService implements ServicoInterface {
+export class MarmitaService implements ServicoInterface {
   constructor(
-    @InjectModel(Grupo.name) private model: Model<Grupo>,
-    private readonly pratoService: PratoService,
+    @InjectModel(Marmita.name) private model: Model<Marmita>,
+    @Inject(forwardRef(() => PedidoService))
+    private readonly pedidoService: PedidoService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
-  async create(valueDto: InsertGrupoDto): Promise<Grupo> {
+  async create(valueDto: InsertMarmitaDto): Promise<Marmita> {
     const createdCat = new this.model(valueDto);
     return createdCat.save();
   }
 
-  async findById(id: string): Promise<Grupo> {
+  async findById(id: string): Promise<Marmita> {
     return this.model.findById(id).exec();
   }
 
-  async findAll(): Promise<Grupo[]> {
-    return this.model.find().sort({ principal: 'desc', nome: 'asc' }).exec();
+  async findAll(): Promise<Marmita[]> {
+    return this.model.find().exec();
   }
 
   async delete(id: string): Promise<boolean> {
     const transactionSession = await this.connection.startSession();
     transactionSession.startTransaction();
-
     try {
-      if (await this.pratoService.removerPratosGrupoId(id, transactionSession)) {
+      if (await this.pedidoService.removerPedidosMarmitaId(id, transactionSession)) {
         const deletedCount = (
           await this.model
             .deleteOne({ _id: id.toObjectId() })
@@ -43,7 +43,7 @@ export class GrupoService implements ServicoInterface {
         await transactionSession.commitTransaction();
         return deletedCount > 0;
       } else {
-        throw 'Não foi possivel remover pratos vinculados a esse grupo';
+        throw 'Não foi possivel remover pedidos vinculados a essa marmita';
       }
     } catch (e) {
       console.info('Abortando transação');
@@ -54,7 +54,7 @@ export class GrupoService implements ServicoInterface {
     }
   }
 
-  async update(id: string, valueDto: UpdateGrupoDto): Promise<any> {
+  async update(id: string, valueDto: UpdateMarmitaDto): Promise<Marmita> {
     return this.model
       .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
       .exec();

@@ -45,6 +45,13 @@ export class PratoService implements ServicoInterface {
     });
   }
 
+  /**
+   * 
+   * @param grupoId 
+   * @param transactionSession 
+   * @returns 
+   * Remove todos os pratos vinculados com o grupo
+   */
   async removerPratosGrupoId(grupoId: string, transactionSession: ClientSession) {
     const where = { grupo: grupoId.toObjectId() };
     const conta = await this.model

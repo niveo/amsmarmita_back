@@ -74,7 +74,13 @@ export class PedidoService implements ServicoInterface {
       .exec();
   }
 
-  async deleteMarmitaId(id: string, session: ClientSession): Promise<any> {
+  /**
+   * @param id 
+   * @param session 
+   * @returns 
+   * Remove todos os pedidos vinculados a marmita
+   */
+  async removerPedidosMarmitaId(id: string, session: ClientSession): Promise<any> {
     const where = { marmita: id.toObjectId() };
     const conta = await this.model
       .where(where)

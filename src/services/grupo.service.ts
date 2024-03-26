@@ -33,7 +33,7 @@ export class GrupoService implements ServicoInterface {
     transactionSession.startTransaction();
 
     try {
-      if (await this.pratoService.deletePratoId(id, transactionSession)) {
+      if (await this.pratoService.removerPratosGrupoId(id, transactionSession)) {
         const deletedCount = (
           await this.model
             .deleteOne({ _id: id.toObjectId() })

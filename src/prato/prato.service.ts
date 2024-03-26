@@ -45,8 +45,8 @@ export class PratoService implements ServicoInterface {
     });
   }
 
-  async deletePratoId(id: string, transactionSession: ClientSession) {
-    const where = { grupo: id.toObjectId() };
+  async removerPratosGrupoId(grupoId: string, transactionSession: ClientSession) {
+    const where = { grupo: grupoId.toObjectId() };
     const conta = await this.model
       .where(where)
       .countDocuments()

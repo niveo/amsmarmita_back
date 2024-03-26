@@ -4,7 +4,12 @@ export class InsertPedidoPratoDto {
   @IsString()
   @IsNotEmpty()
   @Length(25, 25)
-  pedido: string;
+  comedor: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(25, 25)
+  marmita: string;
 
   @IsString()
   @IsNotEmpty()

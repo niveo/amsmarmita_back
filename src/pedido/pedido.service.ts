@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Connection, Model } from 'mongoose';
 import { Pedido } from './pedido.schema';
 import { PedidoPratoService } from './pedido-prato.service';
 import { PedidoPrato } from './pedido-prato.schema';
+import { ErroInternoException } from '../common/exceptions/errointerno.exception';
 
 @Injectable()
 export class PedidoService implements ServicoInterface {
@@ -27,6 +28,12 @@ export class PedidoService implements ServicoInterface {
     return this.model.find().exec();
   }
 
+  obterPedidoId(marmita: string, comedor: string): Promise<Pedido> {
+    return this.model.findOne({
+      marmita: marmita.toObjectId(), comedor: comedor.toObjectId()
+    }).exec();
+  }
+
   async carregarPedidoPratos(
     marmitaId: string,
     comedorId: string,
@@ -38,6 +45,9 @@ export class PedidoService implements ServicoInterface {
       })
       .select(['comedor', 'marmita', '_id'])
       .exec();
+
+    if(!registro) throw new ErroInternoException('Não existe pedidos nessa marmita.');
+
 
     const pratos = (await this.pedidoPratoService.carregarPedidoPratos(
       registro._id.toString(),

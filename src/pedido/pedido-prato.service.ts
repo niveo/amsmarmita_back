@@ -1,20 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PedidoPrato } from './pedido-prato.schema';
 import { Model } from 'mongoose';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { ClientSession } from 'mongodb';
 import { InsertPedidoPratoDto } from '../dtos/insert-pedido-prato.dto';
+import { PedidoService } from './pedido.service';
 
 @Injectable()
 export class PedidoPratoService implements ServicoInterface {
   constructor(
     @InjectModel(PedidoPrato.name) private model: Model<PedidoPrato>,
+    @Inject(forwardRef(() => PedidoService))
+    private readonly pedidoService: PedidoService
   ) { }
 
   async create(valueDto: InsertPedidoPratoDto): Promise<PedidoPrato> {
+
+    let pedido = await this.pedidoService.obterPedidoId(valueDto.marmita, valueDto.comedor);
+
+    if (pedido == null) {
+      pedido = await this.pedidoService.create({
+        marmita: valueDto.marmita.toObjectId(), comedor: valueDto.comedor.toObjectId()
+      });
+    }
+
     const createdCat = new this.model({
-      pedido: valueDto.pedido.toObjectId(),
+      pedido: pedido._id,
       prato: valueDto.prato.toObjectId(),
       quantidade: valueDto.quantidade,
     });

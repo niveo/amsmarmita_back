@@ -14,6 +14,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { URL_MONGODB } from './common/constantes';
 import { Comedor, ComedorSchema } from './schemas/comedor.schema';
 import { Grupo, GrupoSchema } from './schemas/grupo.schema';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/auth.guard';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -35,8 +38,17 @@ import { Grupo, GrupoSchema } from './schemas/grupo.schema';
     PedidoModule,
     PratoModule,
     MarmitaModule,
+    AuthModule
   ],
   controllers: [AppController, ComedorController, GrupoController],
-  providers: [AppService, ComedorService, GrupoService],
+  providers: [
+    AppService,
+    ComedorService,
+    GrupoService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
+    }
+  ],
 })
-export class AppModule {}
+export class AppModule { }

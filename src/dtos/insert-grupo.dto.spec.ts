@@ -18,7 +18,7 @@ describe('InsertGrupoDto', () => {
       nome: 1,
       observacao: 1,
       principal: 'A',
-      multiploe: 'A'
+      multiplo: 'A'
     };
 
     const myDtoObject = plainToInstance(InsertGrupoDto, myBodyObject);

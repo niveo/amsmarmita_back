@@ -14,15 +14,7 @@ export class AuthService {
   async signIn(
     pass: string,
   ): Promise<{ access_token: string }> {
-
-    console.log('entrada: ', this.config.get(PASSWORD))
-    console.log('input:', pass)
     const passsh256 = sha256.update(this.config.get(PASSWORD)).hex();
-
-    console.log(passsh256)
-
-    console.log(passsh256 === pass)
-
     if (passsh256 !== pass) {
       throw new UnauthorizedException();
     }

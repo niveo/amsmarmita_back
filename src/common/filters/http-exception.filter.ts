@@ -8,6 +8,7 @@ import {
 import { HttpAdapterHost } from '@nestjs/core';
 import { Response } from 'express';
 import { ErroInternoException } from '../exceptions/errointerno.exception';
+import { error } from 'console';
 
 @Catch(HttpException, ErroInternoException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -16,6 +17,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
     const request = ctx.getRequest<Request>();
+
+    error(request.url)
 
     console.error('exception: ');
     console.error(exception.name);

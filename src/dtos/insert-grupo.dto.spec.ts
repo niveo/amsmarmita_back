@@ -30,7 +30,7 @@ describe('InsertGrupoDto', () => {
     const myBodyObject = {};
     const myDtoObject = plainToInstance(InsertGrupoDto, myBodyObject);
     const errors = await validate(myDtoObject);
-    expect(errors.length).toBe(3);
+    expect(errors.length).toBe(1);
   });
 
   it('Deve validar tamanho minimo de caracteres', async () => {

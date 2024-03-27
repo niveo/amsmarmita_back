@@ -9,13 +9,19 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './auth.util';
 import { ConfigService } from '@nestjs/config';
-import { JWT_SECRET_KEY } from '../common/constantes';
+import { JWT_SECRET_KEY, PRODUCAO_KEY } from '../common/constantes';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService, private reflector: Reflector, private config: ConfigService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+
+    //Se não for produção não passar por autenticação
+    if (!String(this.config.getOrThrow(PRODUCAO_KEY)).toBoolean()) {
+      return true;
+    }
+
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),

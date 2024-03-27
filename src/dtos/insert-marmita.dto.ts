@@ -1,5 +1,5 @@
 import {
-  IsDate,
+  IsDateString,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 
 export class InsertMarmitaDto {
-  @IsDate()
+  @IsDateString()
   @IsNotEmpty()
   lancamento: Date;
 

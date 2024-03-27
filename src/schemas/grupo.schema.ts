@@ -21,13 +21,13 @@ export class Grupo {
     isRequired: true,
     default: false,
   })
-  principal: boolean = false;
+  principal: boolean;
 
   @Prop({
     isRequired: true,
     default: false
   })
-  multiplo: boolean = false;
+  multiplo: boolean;
 
   @Prop({
     max: 100,

@@ -34,11 +34,13 @@ describe('GrupoService', () => {
         nome: 'Teste',
         observacao: 'Teste',
         principal: false,
+        multiplo: false,
       });
       expect(registro).not.toBeNull();
       registroId = registro._id.toString();
-      const { nome } = registro;
+      const { nome, observacao } = registro;
       expect(nome).toEqual('Teste');
+      expect(observacao).toEqual('Teste');
     });
 
     it('Atualizar nome do registro', async () => {

@@ -13,7 +13,7 @@ export class GrupoService implements ServicoInterface {
     @InjectModel(Grupo.name) private model: Model<Grupo>,
     private readonly pratoService: PratoService,
     @InjectConnection() private readonly connection: mongoose.Connection,
-  ) {}
+  ) { }
 
   async create(valueDto: InsertGrupoDto): Promise<Grupo> {
     const createdCat = new this.model(valueDto);
@@ -21,7 +21,7 @@ export class GrupoService implements ServicoInterface {
   }
 
   async findById(id: string): Promise<Grupo> {
-    return this.model.findById(id).exec();
+    return this.model.findById(id.toObjectId()).exec();
   }
 
   async findAll(): Promise<Grupo[]> {
@@ -54,9 +54,9 @@ export class GrupoService implements ServicoInterface {
     }
   }
 
-  async update(id: string, valueDto: UpdateGrupoDto): Promise<any> {
+  async update(id: string, valueDto: UpdateGrupoDto): Promise<Grupo> {
     return this.model
-      .findByIdAndUpdate({ _id: id }, valueDto, { new: true })
+      .findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, { new: true })
       .exec();
   }
 }

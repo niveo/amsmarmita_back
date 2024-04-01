@@ -19,6 +19,10 @@ export class PedidoPrato {
   @Type(() => Prato)
   prato: Prato;
 
+  @Prop({ type: [Types.ObjectId], ref: 'Prato' })
+  @Type(() => Prato)
+  acompanhamentos: Prato[];
+
   @Prop({
     isRequired: true,
     isInteger: true,

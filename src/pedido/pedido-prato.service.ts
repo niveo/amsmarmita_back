@@ -7,21 +7,37 @@ import { ClientSession } from 'mongodb';
 import { InsertPedidoPratoDto } from '../dtos/insert-pedido-prato.dto';
 import { PedidoService } from './pedido.service';
 
+const POPULATE = [
+  {
+    path: 'prato',
+    select: ['grupo', 'nome'],
+  },
+  {
+    path: 'acompanhamentos',
+    populate: {
+      path: 'grupo',
+    },
+  },
+];
+
 @Injectable()
 export class PedidoPratoService implements ServicoInterface {
   constructor(
     @InjectModel(PedidoPrato.name) private model: Model<PedidoPrato>,
     @Inject(forwardRef(() => PedidoService))
-    private readonly pedidoService: PedidoService
-  ) { }
+    private readonly pedidoService: PedidoService,
+  ) {}
 
   async create(valueDto: InsertPedidoPratoDto): Promise<PedidoPrato> {
-
-    let pedido = await this.pedidoService.obterPedidoId(valueDto.marmita, valueDto.comedor);
+    let pedido = await this.pedidoService.obterPedidoId(
+      valueDto.marmita,
+      valueDto.comedor,
+    );
 
     if (pedido == null) {
       pedido = await this.pedidoService.create({
-        marmita: valueDto.marmita.toObjectId(), comedor: valueDto.comedor.toObjectId()
+        marmita: valueDto.marmita.toObjectId(),
+        comedor: valueDto.comedor.toObjectId(),
       });
     }
 
@@ -29,8 +45,9 @@ export class PedidoPratoService implements ServicoInterface {
       pedido: pedido._id,
       prato: valueDto.prato.toObjectId(),
       quantidade: valueDto.quantidade,
+      acompanhamentos: valueDto.acompanhamentos,
     });
-    return (await createdCat.save()).populate('prato', 'grupo nome');
+    return (await createdCat.save()).populate(POPULATE);
   }
 
   findById(id: string): Promise<any> {
@@ -50,16 +67,14 @@ export class PedidoPratoService implements ServicoInterface {
       .findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
         new: true,
       })
+      .populate(POPULATE)
       .exec();
   }
 
   async carregarPedidoPratos(pedidoId: string) {
-    return this.model.find({ pedido: pedidoId.toObjectId() }).populate({
-      path: 'prato',
-      select: ['grupo', 'nome'],
-      //match: { nome: 'Frango Cozido' },
-      //options: { sort: { '_id': 'asc' } }
-    })//.sort({'prato.nome': 1});
+    return this.model
+      .find({ pedido: pedidoId.toObjectId() })
+      .populate(POPULATE);
   }
 
   deletePedidoId(id: string, session: ClientSession) {

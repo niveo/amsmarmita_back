@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Marmita, MarmitaSchema } from './marmita.schema';
 import { MarmitaController } from './marmita.controller';
 import { MarmitaService } from './marmita.service';
 import { PedidoModule } from '../pedido/pedido.module';
+import { MongooseFeatureMogule } from '../common/mongoose-feature.module';
 
 @Module({
   controllers: [MarmitaController],
@@ -11,12 +10,7 @@ import { PedidoModule } from '../pedido/pedido.module';
   exports: [MarmitaService],
   imports: [
     PedidoModule,
-    MongooseModule.forFeature([
-      {
-        name: Marmita.name,
-        schema: MarmitaSchema,
-      },
-    ]),
+    MongooseFeatureMogule, 
   ],
 })
 export class MarmitaModule {}

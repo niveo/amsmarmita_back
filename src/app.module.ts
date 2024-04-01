@@ -12,11 +12,10 @@ import { GrupoService } from './services/grupo.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { URL_MONGODB } from './common/constantes';
-import { Comedor, ComedorSchema } from './schemas/comedor.schema';
-import { Grupo, GrupoSchema } from './schemas/grupo.schema';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
+import { MongooseFeatureMogule } from './common/mongoose-feature.module';
 
 @Module({
   imports: [
@@ -31,14 +30,11 @@ import { AuthModule } from './auth/auth.module';
       },
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([
-      { name: Comedor.name, schema: ComedorSchema },
-      { name: Grupo.name, schema: GrupoSchema },
-    ]),
+    MongooseFeatureMogule,
     PedidoModule,
     PratoModule,
     MarmitaModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController, ComedorController, GrupoController],
   providers: [
@@ -47,8 +43,8 @@ import { AuthModule } from './auth/auth.module';
     GrupoService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
-    }
+      useClass: AuthGuard,
+    },
   ],
 })
-export class AppModule { }
+export class AppModule {}

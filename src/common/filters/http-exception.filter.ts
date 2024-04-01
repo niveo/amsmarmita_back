@@ -18,24 +18,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const request = ctx.getRequest<Request>();
 
-    error(request.url)
-
-    console.error('exception: ');
-    console.error(exception.name);
-    console.error(exception.message);
-    console.error(exception.stack);
+    error(request.url);
+ 
+    console.error(exception);
 
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
       message: exception.message || '',
-      tipo: exception.name === 'ErroInternoException' ? 1 : 0
+      tipo: exception.name === 'ErroInternoException' ? 1 : 0,
     });
   }
 }
-
-
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

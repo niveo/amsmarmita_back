@@ -7,6 +7,7 @@ import { PedidoController } from './pedido.controller';
 import { MarmitaModule } from '../marmita/marmita.module';
 import { PedidoPratoService } from './pedido-prato.service';
 import { PedidoPratoController } from './pedido-prato.controller';
+import { Grupo, GrupoSchema } from '../schemas/grupo.schema';
 
 @Module({
   controllers: [PedidoController, PedidoPratoController],
@@ -23,6 +24,11 @@ import { PedidoPratoController } from './pedido-prato.controller';
       {
         name: PedidoPrato.name,
         schema: PedidoPratoSchema,
+      },
+
+      {
+        name: Grupo.name,
+        schema: GrupoSchema,
       },
     ]),
   ],

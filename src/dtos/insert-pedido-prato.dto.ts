@@ -3,17 +3,17 @@ import { IsArray, IsNotEmpty, IsNumber, IsString, Length } from 'class-validator
 export class InsertPedidoPratoDto {
   @IsString()
   @IsNotEmpty()
-  @Length(25, 25)
+  @Length(24, 24)
   comedor: string;
 
   @IsString()
   @IsNotEmpty()
-  @Length(25, 25)
+  @Length(24, 24)
   marmita: string;
 
   @IsString()
   @IsNotEmpty()
-  @Length(25, 25)
+  @Length(24, 24)
   prato: string;
 
   @IsNotEmpty()

@@ -25,7 +25,7 @@ export class PratoService implements ServicoInterface {
   }
 
   async findAll(): Promise<Prato[]> {
-    return this.model.find().exec();
+    return this.model.find().populate('grupo').exec();
   }
 
   async delete(id: string): Promise<boolean> {

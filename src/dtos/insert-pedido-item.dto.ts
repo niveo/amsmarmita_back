@@ -1,6 +1,12 @@
-import { IsArray, IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Length,
+} from 'class-validator';
 
-export class InsertPedidoPratoDto {
+export class InsertPedidoItemDto {
   @IsString()
   @IsNotEmpty()
   @Length(24, 24)
@@ -21,5 +27,5 @@ export class InsertPedidoPratoDto {
   quantidade: number;
 
   @IsArray()
-  acompanhamentos: string[];
+  acompanhamentos: string[] = [];
 }

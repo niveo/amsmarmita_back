@@ -9,23 +9,19 @@ import {
   Query,
 } from '@nestjs/common';
 import { PedidoService } from './pedido.service';
-import { PedidoPratoService } from './pedido-prato.service';
 
 @Controller({
   path: 'pedidos',
 })
 export class PedidoController {
-  constructor(
-    private readonly service: PedidoService,
-    private readonly servicePedidoPrato: PedidoPratoService,
-  ) {}
+  constructor(private readonly service: PedidoService) {}
 
   @Get('/marmitas')
   getByMamitaId(
     @Query('marmitaId') marmitaId: string,
     @Query('comedorId') comedorId: string,
   ) {
-    return this.service.carregarPedidoPratos(marmitaId, comedorId);
+    return this.service.carregarItens(marmitaId, comedorId);
   }
 
   @Get()

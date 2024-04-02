@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Connection, Model } from 'mongoose';
-import { Pedido } from './pedido.schema';
 import { PedidoItemService } from './pedido-item.service';
-import { PedidoItem } from './pedido-item.schema';
 import { ErroInternoException } from '../common/exceptions/errointerno.exception';
+import { Pedido, PedidoItem } from '../schemas';
 
 @Injectable()
 export class PedidoService implements ServicoInterface {

@@ -2,10 +2,10 @@ import mongoose, { Model } from 'mongoose';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ServicoInterface } from '../interfaces/servicos.interface';
-import { Marmita } from './marmita.schema';
 import { InsertMarmitaDto } from '../dtos/insert-marmita.dto';
 import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
 import { PedidoService } from '../pedido/pedido.service';
+import { Marmita } from '../schemas';
 
 @Injectable()
 export class MarmitaService implements ServicoInterface {

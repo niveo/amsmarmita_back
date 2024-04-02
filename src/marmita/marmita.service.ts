@@ -33,7 +33,9 @@ export class MarmitaService implements ServicoInterface {
     const transactionSession = await this.connection.startSession();
     transactionSession.startTransaction();
     try {
-      if (await this.pedidoService.removerPedidosMarmitaId(id, transactionSession)) {
+      if (
+        await this.pedidoService.removerPedidosMarmitaId(id, transactionSession)
+      ) {
         const deletedCount = (
           await this.model
             .deleteOne({ _id: id.toObjectId() })
@@ -50,7 +52,7 @@ export class MarmitaService implements ServicoInterface {
       await transactionSession.abortTransaction();
       throw e;
     } finally {
-      transactionSession.endSession();
+      await transactionSession.endSession();
     }
   }
 

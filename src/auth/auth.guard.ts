@@ -13,10 +13,13 @@ import { JWT_SECRET_KEY, PRODUCAO_KEY } from '../common/constantes';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector, private config: ConfigService) { }
+  constructor(
+    private jwtService: JwtService,
+    private reflector: Reflector,
+    private config: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-
     //Se não for produção não passar por autenticação
     if (!String(this.config.getOrThrow(PRODUCAO_KEY)).toBoolean()) {
       return true;
@@ -37,12 +40,9 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(
-        token,
-        {
-          secret: this.config.get(JWT_SECRET_KEY)
-        }
-      );
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: this.config.get(JWT_SECRET_KEY),
+      });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload;

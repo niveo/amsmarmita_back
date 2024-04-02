@@ -48,6 +48,7 @@ export class PedidoItemService implements ServicoInterface {
       prato: valueDto.prato.toObjectId(),
       quantidade: valueDto.quantidade,
       acompanhamentos: valueDto.acompanhamentos,
+      observacao: valueDto.observacao,
     });
     return (await createdCat.save()).populate(POPULATE);
   }

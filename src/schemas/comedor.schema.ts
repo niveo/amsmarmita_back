@@ -11,7 +11,6 @@ export class Comedor {
   @Prop({
     index: 'asc',
     isRequired: true,
-    max: 25,
     maxlength: 25,
   })
   nome: string;

@@ -1,11 +1,11 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PedidoPrato } from './pedido-prato.schema';
+import { PedidoItem } from './pedido-item.schema';
 import { Model } from 'mongoose';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { ClientSession } from 'mongodb';
-import { InsertPedidoPratoDto } from '../dtos/insert-pedido-prato.dto';
 import { PedidoService } from './pedido.service';
+import { InsertPedidoItemDto } from '../dtos/insert-pedido-item.dto';
 
 const POPULATE = [
   {
@@ -21,14 +21,14 @@ const POPULATE = [
 ];
 
 @Injectable()
-export class PedidoPratoService implements ServicoInterface {
+export class PedidoItemService implements ServicoInterface {
   constructor(
-    @InjectModel(PedidoPrato.name) private model: Model<PedidoPrato>,
+    @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
   ) {}
 
-  async create(valueDto: InsertPedidoPratoDto): Promise<PedidoPrato> {
+  async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
     let pedido = await this.pedidoService.obterPedidoId(
       valueDto.marmita,
       valueDto.comedor,
@@ -71,7 +71,7 @@ export class PedidoPratoService implements ServicoInterface {
       .exec();
   }
 
-  async carregarPedidoPratos(pedidoId: string) {
+  async carregarItens(pedidoId: string) {
     return this.model
       .find({ pedido: pedidoId.toObjectId() })
       .populate(POPULATE);

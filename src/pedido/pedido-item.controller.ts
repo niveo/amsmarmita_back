@@ -7,13 +7,13 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { PedidoPratoService } from './pedido-prato.service';
+import { PedidoItemService } from './pedido-item.service';
 
 @Controller({
-  path: 'pedidopratos',
+  path: 'pedidoitens',
 })
-export class PedidoPratoController {
-  constructor(private readonly service: PedidoPratoService) {}
+export class PedidoItemController {
+  constructor(private readonly service: PedidoItemService) {}
 
   @Get()
   getAll() {

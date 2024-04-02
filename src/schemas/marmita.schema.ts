@@ -15,7 +15,6 @@ export class Marmita {
   lancamento: Date;
 
   @Prop({
-    max: 100,
     maxlength: 100,
   })
   observacao: string;

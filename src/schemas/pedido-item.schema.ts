@@ -30,7 +30,6 @@ export class PedidoItem {
   quantidade: number;
 
   @Prop({
-    max: 100,
     maxlength: 100,
   })
   observacao: string;

@@ -13,7 +13,6 @@ export class Prato {
   @Prop({
     index: 'asc',
     isRequired: true,
-    max: 50,
     maxlength: 50,
   })
   nome: string;
@@ -25,7 +24,6 @@ export class Prato {
   composicoes: string[];
 
   @Prop({
-    max: 100,
     maxlength: 100,
   })
   observacao: string;

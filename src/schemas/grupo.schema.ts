@@ -12,7 +12,6 @@ export class Grupo {
   @Prop({
     index: 'asc',
     isRequired: true,
-    max: 25,
     maxlength: 25,
   })
   nome: string;
@@ -30,13 +29,11 @@ export class Grupo {
   multiplo: boolean;
 
   @Prop({
-    max: 100,
     maxlength: 100,
   })
   observacao: string;
 
   @Prop({
-    max: 7,
     maxlength: 7,
   })
   cor: string;

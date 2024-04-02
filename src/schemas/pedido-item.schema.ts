@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Type } from 'class-transformer';
-import { Prato } from './prato.schema';
 import { Pedido } from './pedido.schema';
+import { Prato } from './prato.schema';
 export type PedidoItemDocument = HydratedDocument<PedidoItem>;
 
 @Schema({
@@ -28,6 +28,12 @@ export class PedidoItem {
     isInteger: true,
   })
   quantidade: number;
+
+  @Prop({
+    max: 100,
+    maxlength: 100,
+  })
+  observacao: string;
 }
 
 export const PedidoItemSchema = SchemaFactory.createForClass(PedidoItem);

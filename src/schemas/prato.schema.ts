@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { Grupo } from '../schemas/grupo.schema';
+import { Grupo } from './grupo.schema';
 
 export type PratoDocument = HydratedDocument<Prato>;
 

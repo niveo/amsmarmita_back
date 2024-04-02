@@ -12,13 +12,13 @@ import { JWT_SECRET_KEY, JWT_EXPIRATION_TIME } from '../common/constantes';
       global: true,
       useFactory: (config: ConfigService) => ({
         secret: config.get(JWT_SECRET_KEY),
-        signOptions: { expiresIn: config.get(JWT_EXPIRATION_TIME) }
+        signOptions: { expiresIn: config.get(JWT_EXPIRATION_TIME) },
       }),
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
   ],
   providers: [AuthService],
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

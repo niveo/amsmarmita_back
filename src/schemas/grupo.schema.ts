@@ -25,7 +25,7 @@ export class Grupo {
 
   @Prop({
     isRequired: true,
-    default: false
+    default: false,
   })
   multiplo: boolean;
 

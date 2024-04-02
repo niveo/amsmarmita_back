@@ -72,13 +72,13 @@ export class PedidoService implements ServicoInterface {
         await this.model.deleteOne({ _id: id }).session(session).exec()
       ).deletedCount;
 
-      session.commitTransaction();
+      await session.commitTransaction();
 
       return deletedCount > 0;
     } catch (e) {
-      session.abortTransaction();
+      await session.abortTransaction();
     } finally {
-      session.endSession();
+      await session.endSession();
     }
   }
 

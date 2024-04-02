@@ -61,8 +61,22 @@ export class PedidoItemService implements ServicoInterface {
     throw new Error('Method not implemented.');
   }
 
-  async delete(id: string): Promise<any> {
-    return (await this.model.deleteOne({ _id: id }).exec()).deletedCount > 0;
+  async delete(id: string): Promise<boolean> {
+    const pedidoItem = await this.model.findByIdAndDelete(id).exec();
+
+    if (pedidoItem != null) {
+      setTimeout(() => {
+        this.model
+          .countDocuments({ pedido: pedidoItem.pedido })
+          .then((conta: number) => {
+            if (conta === 0) {
+              this.pedidoService.delete(String(pedidoItem.pedido)).then();
+            }
+          });
+      }, 300);
+    }
+
+    return pedidoItem !== null;
   }
 
   async update(id: string, valueDto: any): Promise<any> {

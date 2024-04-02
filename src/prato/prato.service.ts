@@ -5,7 +5,7 @@ import { InsertPratoDto } from '../dtos/insert-prato.dto';
 import { UpdatePratoDto } from '../dtos/update-prato.dto';
 import { ClientSession, Model } from 'mongoose';
 import { cloneMongoDocument } from '../common/utils';
-import { Prato } from './prato.schema';
+import { Prato } from '../schemas/prato.schema';
 
 @Injectable()
 export class PratoService implements ServicoInterface {
@@ -29,8 +29,10 @@ export class PratoService implements ServicoInterface {
   }
 
   async delete(id: string): Promise<boolean> {
-    return (await this.model.deleteOne({ _id: id.toObjectId() }).exec())
-      .deletedCount > 0;
+    return (
+      (await this.model.deleteOne({ _id: id.toObjectId() }).exec())
+        .deletedCount > 0
+    );
   }
 
   async duplicar(id: any): Promise<any> {
@@ -40,19 +42,24 @@ export class PratoService implements ServicoInterface {
   }
 
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {
-    return this.model.findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
-      new: true,
-    }).populate('grupo');;
+    return this.model
+      .findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
+        new: true,
+      })
+      .populate('grupo');
   }
 
   /**
-   * 
-   * @param grupoId 
-   * @param transactionSession 
-   * @returns 
+   *
+   * @param grupoId
+   * @param transactionSession
+   * @returns
    * Remove todos os pratos vinculados com o grupo
    */
-  async removerPratosGrupoId(grupoId: string, transactionSession: ClientSession) {
+  async removerPratosGrupoId(
+    grupoId: string,
+    transactionSession: ClientSession,
+  ) {
     const where = { grupo: grupoId.toObjectId() };
     const conta = await this.model
       .where(where)

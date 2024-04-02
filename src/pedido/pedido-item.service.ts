@@ -1,11 +1,11 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PedidoItem } from './pedido-item.schema';
 import { Model } from 'mongoose';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { ClientSession } from 'mongodb';
 import { PedidoService } from './pedido.service';
 import { InsertPedidoItemDto } from '../dtos/insert-pedido-item.dto';
+import { PedidoItem } from '../schemas/pedido-item.schema';
 
 const POPULATE = [
   {

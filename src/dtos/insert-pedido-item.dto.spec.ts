@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { InsertPedidoItemDto } from './insert-pedido-iten.dto';
+import { InsertPedidoItemDto } from './insert-pedido-item.dto';
 
 describe('InsertPedidoItemDto', () => {
   it('Deve validar tamanho maximo de caracteres', async () => {

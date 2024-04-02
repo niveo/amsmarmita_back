@@ -13,7 +13,7 @@ export class GrupoService implements ServicoInterface {
     @InjectModel(Grupo.name) private model: Model<Grupo>,
     private readonly pratoService: PratoService,
     @InjectConnection() private readonly connection: mongoose.Connection,
-  ) { }
+  ) {}
 
   async create(valueDto: InsertGrupoDto): Promise<Grupo> {
     const createdCat = new this.model(valueDto);
@@ -33,7 +33,9 @@ export class GrupoService implements ServicoInterface {
     transactionSession.startTransaction();
 
     try {
-      if (await this.pratoService.removerPratosGrupoId(id, transactionSession)) {
+      if (
+        await this.pratoService.removerPratosGrupoId(id, transactionSession)
+      ) {
         const deletedCount = (
           await this.model
             .deleteOne({ _id: id.toObjectId() })

@@ -24,4 +24,10 @@ export class InsertGrupoDto {
   @IsBoolean()
   @IsNotEmpty()
   multiplo?: boolean = false;
+
+
+  @IsString()
+  @IsOptional()
+  @Length(0, 7)
+  cor?: string;
 }

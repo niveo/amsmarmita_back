@@ -10,7 +10,9 @@ import { PedidoItem } from '../schemas/pedido-item.schema';
 const POPULATE = [
   {
     path: 'prato',
-    select: ['grupo', 'nome'],
+    populate: {
+      path: 'grupo',
+    },
   },
   {
     path: 'acompanhamentos',

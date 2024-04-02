@@ -34,6 +34,12 @@ export class Grupo {
     maxlength: 100,
   })
   observacao: string;
+
+  @Prop({
+    max: 7,
+    maxlength: 7,
+  })
+  cor: string;
 }
 
 export const GrupoSchema = SchemaFactory.createForClass(Grupo);

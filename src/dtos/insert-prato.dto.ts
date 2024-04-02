@@ -14,7 +14,7 @@ export class InsertPratoDto {
 
   @IsString()
   @IsNotEmpty()
-  @Length(25, 25)
+  @Length(24, 24)
   grupo?: string;
 
   @IsArray()

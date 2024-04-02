@@ -17,11 +17,11 @@ export class PratoService implements ServicoInterface {
       grupo: valueDto.grupo.toObjectId(),
     };
     const createdCat = new this.model(data);
-    return createdCat.save();
+    return (await createdCat.save()).populate('grupo');
   }
 
   async findById(id: string): Promise<Prato> {
-    return this.model.findById(id).exec();
+    return this.model.findById(id).populate('grupo').exec();
   }
 
   async findAll(): Promise<Prato[]> {
@@ -42,7 +42,7 @@ export class PratoService implements ServicoInterface {
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {
     return this.model.findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
       new: true,
-    });
+    }).populate('grupo');;
   }
 
   /**

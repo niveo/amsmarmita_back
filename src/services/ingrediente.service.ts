@@ -22,7 +22,7 @@ export class IngredienteService implements ServicoInterface {
   }
 
   async findAll(): Promise<Ingrediente[]> {
-    return await this.model.find().exec();
+    return await this.model.find().sort({ nome: 1 }).exec();
   }
 
   async delete(id: string): Promise<boolean> {

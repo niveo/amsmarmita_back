@@ -25,4 +25,8 @@ export class InsertPratoDto {
   @IsOptional()
   @Length(0, 100)
   observacao?: string;
+
+  @IsArray()
+  @IsOptional()
+  ingredientes?: string[];
 }

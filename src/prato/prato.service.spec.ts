@@ -26,11 +26,13 @@ describe('PratoService', () => {
       const registro = await service.create({
         grupo: '65e227dcc0461027f9417358',
         nome: 'Teste',
+        ingredientes: ['660d408c1b739a1fdd657f49', '660d40d0ff3c3dbd7acf71a4'],
       });
       expect(registro).not.toBeNull();
       registroId = registro._id.toString();
-      const { nome } = registro;
+      const { nome, ingredientes } = registro;
       expect(nome).toEqual('Teste');
+      expect(ingredientes).toHaveLength(2);
     });
 
     it('Atualizar nome do registro', async () => {

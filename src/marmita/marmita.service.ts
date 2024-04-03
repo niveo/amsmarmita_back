@@ -26,7 +26,7 @@ export class MarmitaService implements ServicoInterface {
   }
 
   async findAll(): Promise<Marmita[]> {
-    return this.model.find().exec();
+    return this.model.find().sort({ lancamento: -1 }).exec();
   }
 
   async delete(id: string): Promise<boolean> {

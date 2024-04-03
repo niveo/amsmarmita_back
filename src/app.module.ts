@@ -16,6 +16,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
 import { MongooseFeatureMogule } from './common/mongoose-feature.module';
+import { IngredienteService } from './services/ingrediente.service';
+import { IngredienteController } from './controllers/ingrediente.controller';
 
 @Module({
   imports: [
@@ -36,11 +38,17 @@ import { MongooseFeatureMogule } from './common/mongoose-feature.module';
     MarmitaModule,
     AuthModule,
   ],
-  controllers: [AppController, ComedorController, GrupoController],
+  controllers: [
+    AppController,
+    ComedorController,
+    GrupoController,
+    IngredienteController,
+  ],
   providers: [
     AppService,
     ComedorService,
     GrupoService,
+    IngredienteService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

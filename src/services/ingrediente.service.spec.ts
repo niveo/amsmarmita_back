@@ -1,19 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PratoService } from './prato.service';
-import { PratoModule } from './prato.module';
 import {
   closeInMongodConnection,
   rootMongooseTestModule,
 } from '../test/mongo/mongoose-test.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Ingrediente, IngredienteSchema } from '../schemas';
+import { IngredienteService } from './ingrediente.service';
 
-describe('PratoService', () => {
-  let service: PratoService;
+describe('IngredienteService', () => {
+  let service: IngredienteService;
 
   beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      imports: [rootMongooseTestModule(), PratoModule],
+      imports: [
+        rootMongooseTestModule(),
+        MongooseModule.forFeature([
+          { name: Ingrediente.name, schema: IngredienteSchema },
+        ]),
+      ],
+      providers: [IngredienteService],
     }).compile();
-    service = app.get<PratoService>(PratoService);
+    service = app.get<IngredienteService>(IngredienteService);
   });
 
   it('should be defined', () => {
@@ -24,26 +31,25 @@ describe('PratoService', () => {
     let registroId: string;
     it('Verificar registro e nome do registro criado', async () => {
       const registro = await service.create({
-        grupo: '65e227dcc0461027f9417358',
         nome: 'Teste',
-        ingredientes: ['660d408c1b739a1fdd657f49', '660d40d0ff3c3dbd7acf71a4'],
+        observacao: 'Teste',
       });
       expect(registro).not.toBeNull();
       registroId = registro._id.toString();
-      const { nome, ingredientes } = registro;
+      const { nome, observacao } = registro;
       expect(nome).toEqual('Teste');
-      expect(ingredientes).toHaveLength(2);
+      expect(observacao).toEqual('Teste');
     });
 
     it('Atualizar nome do registro', async () => {
-      const registroUpdate = await service.update(registroId.toString(), {
+      const registroUpdate = await service.update(registroId, {
         nome: 'Teste 2',
       });
       expect(registroUpdate.nome).toEqual('Teste 2');
     });
 
     it('Registro não pode ser nulo', async () => {
-      const registroFind = await service.findById(registroId.toString());
+      const registroFind = await service.findById(registroId);
       expect(registroFind).not.toBeNull();
     });
 

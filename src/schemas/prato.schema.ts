@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Grupo } from './grupo.schema';
+import { Type } from 'class-transformer';
+import { Ingrediente } from './ingrediente.schema';
 
 export type PratoDocument = HydratedDocument<Prato>;
 
@@ -27,6 +29,10 @@ export class Prato {
     maxlength: 100,
   })
   observacao: string;
+
+  @Prop({ type: [Types.ObjectId], ref: 'Ingrediente' })
+  @Type(() => Ingrediente)
+  ingredientes: Ingrediente[];
 }
 
 export const PratoSchema = SchemaFactory.createForClass(Prato);

@@ -24,6 +24,11 @@ export class PedidoController {
     return this.service.carregarItens(marmitaId, comedorId);
   }
 
+  @Get('/relatorio')
+  carregarRelatorio(@Query('marmitaId') marmitaId: string) {
+    return this.service.carregarRelatorio(marmitaId);
+  }
+
   @Get()
   getAll() {
     return this.service.findAll();

@@ -15,6 +15,7 @@ export class PratoService implements ServicoInterface {
     const data: any = {
       ...valueDto,
       grupo: valueDto.grupo.toObjectId(),
+      ingredientes: valueDto.ingredientes?.map((m) => m.toObjectId()),
     };
     const createdCat = new this.model(data);
     return (await createdCat.save()).populate('grupo');
@@ -43,9 +44,17 @@ export class PratoService implements ServicoInterface {
 
   async update(id: string, valueDto: UpdatePratoDto): Promise<any> {
     return this.model
-      .findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
-        new: true,
-      })
+      .findByIdAndUpdate(
+        { _id: id.toObjectId() },
+        {
+          ...valueDto,
+          grupo: valueDto.grupo.toObjectId(),
+          ingredientes: valueDto.ingredientes?.map((m) => m.toObjectId()),
+        },
+        {
+          new: true,
+        },
+      )
       .populate('grupo');
   }
 

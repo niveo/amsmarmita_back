@@ -1,11 +1,124 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PipelineStage } from 'mongoose';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { ClientSession } from 'mongodb';
 import { PedidoService } from './pedido.service';
 import { InsertPedidoItemDto } from '../dtos/insert-pedido-item.dto';
 import { PedidoItem } from '../schemas/pedido-item.schema';
+import '../common/prototype.extensions';
+
+const aggregate: PipelineStage[] = [
+  {
+    $lookup: {
+      from: 'pedidos',
+      localField: 'pedido',
+      foreignField: '_id',
+      pipeline: [
+        {
+          $lookup: {
+            from: 'marmitas',
+            localField: 'marmita',
+            foreignField: '_id',
+            pipeline: [
+              {
+                $match: {
+                  _id: '660c717d90c39e1a134e9b39'.toObjectId(),
+                },
+              },
+            ],
+            as: 'marmita',
+          },
+        },
+        {
+          $lookup: {
+            from: 'comedores',
+            localField: 'comedor',
+            foreignField: '_id',
+            as: 'comedor',
+          },
+        },
+        {
+          $unset: ['observacao', '__v' /* , 'marmita' */],
+        },
+        {
+          $unwind: '$comedor',
+        },
+        {
+          $unwind: '$marmita',
+        },
+      ],
+      as: 'pedido',
+    },
+  },
+  {
+    $unwind: '$pedido',
+  },
+  {
+    $unset: ['observacao', '__v'],
+  },
+  {
+    $lookup: {
+      from: 'pratos',
+      localField: 'prato',
+      foreignField: '_id',
+      pipeline: [
+        {
+          $unset: ['observacao', '__v', 'composicoes'],
+        },
+        {
+          $lookup: {
+            from: 'grupos',
+            localField: 'grupo',
+            foreignField: '_id',
+            as: 'grupo',
+          },
+        },
+        {
+          $unwind: '$grupo',
+        },
+      ],
+      as: 'prato',
+    },
+  },
+  {
+    $unwind: '$prato',
+  },
+
+  {
+    $lookup: {
+      from: 'pratos',
+      localField: 'acompanhamentos',
+      foreignField: '_id',
+      pipeline: [
+        {
+          $unset: ['__v', 'composicoes'],
+        },
+        {
+          $lookup: {
+            from: 'grupos',
+            localField: 'grupo',
+            foreignField: '_id',
+            pipeline: [
+              {
+                $unset: ['observacao', '__v', 'cor', 'principal'],
+              },
+            ],
+            as: 'grupo',
+          },
+        },
+        {
+          $unwind: '$grupo',
+        },
+      ],
+      as: 'acompanhamentos',
+    },
+  },
+  /*
+  {
+    $unwind: '$acompanhamentos',
+  }, */
+];
 
 const POPULATE = [
   {
@@ -28,7 +141,8 @@ export class PedidoItemService implements ServicoInterface {
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
-  ) {}
+  ) {
+  }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
     let pedido = await this.pedidoService.obterPedidoId(
@@ -45,9 +159,9 @@ export class PedidoItemService implements ServicoInterface {
 
     const createdCat = new this.model({
       pedido: pedido._id,
-      prato: valueDto.prato.toObjectId(),
       quantidade: valueDto.quantidade,
-      acompanhamentos: valueDto.acompanhamentos,
+      prato: valueDto.prato.toObjectId(),
+      acompanhamentos: valueDto.acompanhamentos?.map((m) => m.toObjectId()),
       observacao: valueDto.observacao,
     });
     return (await createdCat.save()).populate(POPULATE);
@@ -81,9 +195,17 @@ export class PedidoItemService implements ServicoInterface {
 
   async update(id: string, valueDto: any): Promise<any> {
     return this.model
-      .findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
-        new: true,
-      })
+      .findByIdAndUpdate(
+        { _id: id.toObjectId() },
+        {
+          ...valueDto,
+          prato: valueDto.prato.toObjectId(),
+          acompanhamentos: valueDto.acompanhamentos?.map((m) => m.toObjectId()),
+        },
+        {
+          new: true,
+        },
+      )
       .populate(POPULATE)
       .exec();
   }

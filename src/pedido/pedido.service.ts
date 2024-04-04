@@ -15,7 +15,11 @@ export class PedidoService implements ServicoInterface {
   ) {}
 
   async create(valueDto: any): Promise<Pedido> {
-    const createdCat = new this.model(valueDto);
+    const createdCat = new this.model({
+      ...valueDto,
+      marmita: valueDto.marmita.toObjectId(),
+      comedor: valueDto.comedor.toObjectId(),
+    });
     return await createdCat.save();
   }
 
@@ -84,9 +88,17 @@ export class PedidoService implements ServicoInterface {
 
   async update(id: string, valueDto: any): Promise<any> {
     return this.model
-      .findByIdAndUpdate({ _id: id.toObjectId() }, valueDto, {
-        new: true,
-      })
+      .findByIdAndUpdate(
+        { _id: id.toObjectId() },
+        {
+          ...valueDto,
+          marmita: valueDto.marmita.toObjectId(),
+          comedor: valueDto.comedor.toObjectId(),
+        },
+        {
+          new: true,
+        },
+      )
       .exec();
   }
 

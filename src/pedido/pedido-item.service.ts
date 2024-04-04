@@ -8,6 +8,9 @@ import { InsertPedidoItemDto } from '../dtos/insert-pedido-item.dto';
 import { PedidoItem } from '../schemas/pedido-item.schema';
 import '../common/prototype.extensions';
 
+const unsetGrupo = ['observacao', '__v', 'cor', 'principal'];
+const unsetPrato = ['observacao', '__v', 'composicoes'];
+
 const aggregate: PipelineStage[] = [
   {
     $lookup: {
@@ -26,6 +29,9 @@ const aggregate: PipelineStage[] = [
                   _id: '660c717d90c39e1a134e9b39'.toObjectId(),
                 },
               },
+              {
+                $unset: ['__v'],
+              },
             ],
             as: 'marmita',
           },
@@ -39,7 +45,7 @@ const aggregate: PipelineStage[] = [
           },
         },
         {
-          $unset: ['observacao', '__v' /* , 'marmita' */],
+          $unset: ['observacao', '__v'],
         },
         {
           $unwind: '$comedor',
@@ -64,13 +70,18 @@ const aggregate: PipelineStage[] = [
       foreignField: '_id',
       pipeline: [
         {
-          $unset: ['observacao', '__v', 'composicoes'],
+          $unset: unsetPrato,
         },
         {
           $lookup: {
             from: 'grupos',
             localField: 'grupo',
             foreignField: '_id',
+            pipeline: [
+              {
+                $unset: unsetGrupo,
+              },
+            ],
             as: 'grupo',
           },
         },
@@ -92,7 +103,7 @@ const aggregate: PipelineStage[] = [
       foreignField: '_id',
       pipeline: [
         {
-          $unset: ['__v', 'composicoes'],
+          $unset: unsetPrato,
         },
         {
           $lookup: {
@@ -101,7 +112,7 @@ const aggregate: PipelineStage[] = [
             foreignField: '_id',
             pipeline: [
               {
-                $unset: ['observacao', '__v', 'cor', 'principal'],
+                $unset: unsetGrupo,
               },
             ],
             as: 'grupo',
@@ -141,8 +152,7 @@ export class PedidoItemService implements ServicoInterface {
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
-  ) {
-  }
+  ) {}
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
     let pedido = await this.pedidoService.obterPedidoId(
@@ -152,8 +162,8 @@ export class PedidoItemService implements ServicoInterface {
 
     if (pedido == null) {
       pedido = await this.pedidoService.create({
-        marmita: valueDto.marmita.toObjectId(),
-        comedor: valueDto.comedor.toObjectId(),
+        marmita: valueDto.marmita,
+        comedor: valueDto.comedor,
       });
     }
 

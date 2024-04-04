@@ -5,6 +5,8 @@ import { ClientSession, Connection, Model } from 'mongoose';
 import { PedidoItemService } from './pedido-item.service';
 import { ErroInternoException } from '../common/exceptions/errointerno.exception';
 import { Pedido, PedidoItem } from '../schemas';
+import { InsertPedidoDto } from '../dtos/insert-pedido.dto';
+import { UpdatePedidoDto } from '../dtos/update-pedido.dto';
 
 @Injectable()
 export class PedidoService implements ServicoInterface {
@@ -14,7 +16,7 @@ export class PedidoService implements ServicoInterface {
     @InjectConnection() private connection: Connection,
   ) {}
 
-  async create(valueDto: any): Promise<Pedido> {
+  async create(valueDto: InsertPedidoDto): Promise<Pedido> {
     const createdCat = new this.model({
       ...valueDto,
       marmita: valueDto.marmita.toObjectId(),
@@ -86,7 +88,7 @@ export class PedidoService implements ServicoInterface {
     }
   }
 
-  async update(id: string, valueDto: any): Promise<any> {
+  async update(id: string, valueDto: UpdatePedidoDto): Promise<any> {
     return this.model
       .findByIdAndUpdate(
         { _id: id.toObjectId() },

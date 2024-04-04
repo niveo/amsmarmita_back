@@ -148,6 +148,8 @@ const POPULATE = [
 
 @Injectable()
 export class PedidoItemService implements ServicoInterface {
+  sortPrincipal = (a, b) => Number(b.principal) - Number(a.principal);
+
   constructor(
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
     @Inject(forwardRef(() => PedidoService))
@@ -204,12 +206,13 @@ export class PedidoItemService implements ServicoInterface {
   }
 
   async update(id: string, valueDto: any): Promise<any> {
+    console.log(valueDto);
+
     return this.model
       .findByIdAndUpdate(
         { _id: id.toObjectId() },
         {
           ...valueDto,
-          prato: valueDto.prato.toObjectId(),
           acompanhamentos: valueDto.acompanhamentos?.map((m) => m.toObjectId()),
         },
         {

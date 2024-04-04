@@ -149,6 +149,9 @@ const POPULATE = [
 @Injectable()
 export class PedidoItemService implements ServicoInterface {
   sortPrincipal = (a, b) => Number(b.principal) - Number(a.principal);
+  sortPrato = (a, b) => a.prato!.localeCompare(b.prato!);
+  sortComedor = (a: PedidoRelatorioComedorDto, b: PedidoRelatorioComedorDto) =>
+    a.comedor!.localeCompare(b.comedor!);
 
   constructor(
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
@@ -301,9 +304,14 @@ export class PedidoItemService implements ServicoInterface {
 
         return [...pratos.values()]
           .map((m) => {
-            return { ...m, comedores: m.comedores() };
+            return { ...m, comedores: m.comedores().sort(this.sortComedor) };
           })
-          .sort(this.sortPrincipal);
+          .sort(this.sortPrincipal)
+          .sort(this.sortPrato)
+          .map((m) => {
+            delete m.comedoresMap;
+            return m;
+          });
       });
   }
 }

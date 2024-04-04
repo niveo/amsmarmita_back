@@ -7,11 +7,15 @@ import { PedidoService } from './pedido.service';
 import { InsertPedidoItemDto } from '../dtos/insert-pedido-item.dto';
 import { PedidoItem } from '../schemas/pedido-item.schema';
 import '../common/prototype.extensions';
+import {
+  PedidoRelatorioComedorDto,
+  PedidoRelatorioDto,
+} from '../dtos/pedido-relatorio.dto';
 
 const unsetGrupo = ['observacao', '__v', 'cor', 'principal'];
 const unsetPrato = ['observacao', '__v', 'composicoes'];
 
-const aggregate: PipelineStage[] = [
+const aggregate = (marmitaId: string): PipelineStage[] => [
   {
     $lookup: {
       from: 'pedidos',
@@ -26,7 +30,7 @@ const aggregate: PipelineStage[] = [
             pipeline: [
               {
                 $match: {
-                  _id: '660c717d90c39e1a134e9b39'.toObjectId(),
+                  _id: marmitaId.toObjectId(),
                 },
               },
               {
@@ -125,10 +129,6 @@ const aggregate: PipelineStage[] = [
       as: 'acompanhamentos',
     },
   },
-  /*
-  {
-    $unwind: '$acompanhamentos',
-  }, */
 ];
 
 const POPULATE = [
@@ -149,6 +149,9 @@ const POPULATE = [
 @Injectable()
 export class PedidoItemService implements ServicoInterface {
   sortPrincipal = (a, b) => Number(b.principal) - Number(a.principal);
+  sortPrato = (a, b) => a.prato!.localeCompare(b.prato!);
+  sortComedor = (a: PedidoRelatorioComedorDto, b: PedidoRelatorioComedorDto) =>
+    a.comedor!.localeCompare(b.comedor!);
 
   constructor(
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
@@ -206,8 +209,6 @@ export class PedidoItemService implements ServicoInterface {
   }
 
   async update(id: string, valueDto: any): Promise<any> {
-    console.log(valueDto);
-
     return this.model
       .findByIdAndUpdate(
         { _id: id.toObjectId() },
@@ -234,5 +235,83 @@ export class PedidoItemService implements ServicoInterface {
       .deleteMany({ pedido: id.toObjectId() })
       .session(session)
       .exec();
+  }
+
+  carregarRelatorio(marmitaId: string): Promise<any[]> {
+    const pratos = new Map<string, PedidoRelatorioDto>();
+
+    const inserirItenPrato = (iten, prato, acompanha = false) => {
+      const _id = prato._id.toString();
+      const comedorId = iten.pedido.comedor._id.toString();
+
+      const comedorIten: PedidoRelatorioComedorDto = {
+        comedor: iten.pedido.comedor.nome,
+        quantidade: iten.quantidade,
+      };
+
+      if (acompanha) {
+        if (!comedorIten.de) comedorIten.de = [];
+        comedorIten.de.push(iten.prato.nome);
+      }
+
+      if (!pratos.has(_id)) {
+        const comedores = new Map<string, PedidoRelatorioComedorDto>();
+
+        comedores.set(comedorId, comedorIten);
+
+        const base = new PedidoRelatorioDto();
+        base.prato =
+          (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
+        base.quantidade = iten.quantidade;
+        base.comedoresMap = comedores;
+
+        base['principal'] = !acompanha;
+
+        pratos.set(_id, base);
+      } else {
+        const registro = pratos.get(_id);
+
+        registro.quantidade += iten.quantidade;
+
+        if (!registro.comedoresMap.has(comedorId)) {
+          registro.comedoresMap.set(comedorId, comedorIten);
+        } else {
+          const comedorIten = registro.comedoresMap.get(comedorId);
+
+          comedorIten.quantidade += iten.quantidade;
+
+          if (acompanha) {
+            if (!comedorIten.de) comedorIten.de = [];
+            comedorIten.de.push(iten.prato.nome);
+          }
+        }
+      }
+    };
+
+    return this.model
+      .aggregate(aggregate(marmitaId))
+
+      .then((itens) => {
+        itens.forEach((iten: any) => {
+          inserirItenPrato(iten, iten.prato);
+
+          if (iten.acompanhamentos && iten.acompanhamentos.length > 0) {
+            iten.acompanhamentos.forEach((e: any) => {
+              inserirItenPrato(iten, e, true);
+            });
+          }
+        });
+
+        return [...pratos.values()]
+          .map((m) => {
+            return { ...m, comedores: m.comedores().sort(this.sortComedor) };
+          })
+          .sort(this.sortPrincipal)
+          .sort(this.sortPrato)
+          .map((m) => {
+            delete m.comedoresMap;
+            return m;
+          });
+      });
   }
 }

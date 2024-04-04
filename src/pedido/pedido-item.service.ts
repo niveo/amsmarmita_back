@@ -11,6 +11,7 @@ import {
   PedidoRelatorioComedorDto,
   PedidoRelatorioDto,
 } from '../dtos/pedido-relatorio.dto';
+import { v5 as uuidv5 } from 'uuid';
 
 const unsetGrupo = ['observacao', '__v', 'cor', 'principal'];
 const unsetPrato = ['observacao', '__v', 'composicoes'];
@@ -157,7 +158,11 @@ export class PedidoItemService implements ServicoInterface {
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
-  ) {}
+  ) {
+    this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
+      console.log(JSON.stringify(ret, null, 4));
+    });
+  }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
     let pedido = await this.pedidoService.obterPedidoId(
@@ -241,7 +246,8 @@ export class PedidoItemService implements ServicoInterface {
     const pratos = new Map<string, PedidoRelatorioDto>();
 
     const inserirItenPrato = (iten, prato, acompanha = false) => {
-      const _id = prato._id.toString();
+      const _id = uuidv5(`${prato._id.toString()}-${acompanha}`, uuidv5.URL);
+
       const comedorId = iten.pedido.comedor._id.toString();
 
       const comedorIten: PedidoRelatorioComedorDto = {
@@ -306,8 +312,9 @@ export class PedidoItemService implements ServicoInterface {
           .map((m) => {
             return { ...m, comedores: m.comedores().sort(this.sortComedor) };
           })
-          .sort(this.sortPrincipal)
           .sort(this.sortPrato)
+          .sort(this.sortPrincipal)
+
           .map((m) => {
             delete m.comedoresMap;
             return m;

@@ -242,11 +242,15 @@ export class PedidoItemService implements ServicoInterface {
       .exec();
   }
 
-  carregarRelatorio(marmitaId: string): Promise<any[]> {
+  carregarRelatorio(marmitaId: string): Promise<any> {
     const pratos = new Map<string, PedidoRelatorioDto>();
+    const pratoGeral = new Map<string, { prato: string; quantidade: number }>();
 
     const inserirItenPrato = (iten, prato, acompanha = false) => {
-      const _id = uuidv5(`${prato._id.toString()}-${acompanha}`, uuidv5.URL);
+      const pratoId = prato._id.toString();
+      const pratoNome =
+        (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
+      const _id = uuidv5(`${pratoId}-${acompanha}`, uuidv5.URL);
 
       const comedorId = iten.pedido.comedor._id.toString();
 
@@ -266,8 +270,8 @@ export class PedidoItemService implements ServicoInterface {
         comedores.set(comedorId, comedorIten);
 
         const base = new PedidoRelatorioDto();
-        base.prato =
-          (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
+        base.prato = pratoNome;
+
         base.quantidade = iten.quantidade;
         base.comedoresMap = comedores;
 
@@ -292,6 +296,15 @@ export class PedidoItemService implements ServicoInterface {
           }
         }
       }
+
+      if (!pratoGeral.has(pratoId)) {
+        pratoGeral.set(pratoId, {
+          prato: pratoNome,
+          quantidade: iten.quantidade,
+        });
+      } else {
+        pratoGeral.get(pratoId).quantidade += iten.quantidade;
+      }
     };
 
     return this.model
@@ -308,7 +321,7 @@ export class PedidoItemService implements ServicoInterface {
           }
         });
 
-        return [...pratos.values()]
+        const retornoPratos = [...pratos.values()]
           .map((m) => {
             return { ...m, comedores: m.comedores().sort(this.sortComedor) };
           })
@@ -319,6 +332,10 @@ export class PedidoItemService implements ServicoInterface {
             delete m.comedoresMap;
             return m;
           });
+
+        const retornoGeral = [...pratoGeral.values()];
+
+        return { pratos: retornoPratos, geral: retornoGeral };
       });
   }
 }

@@ -13,8 +13,9 @@ import {
 } from '../dtos/pedido-relatorio.dto';
 import { v5 as uuidv5 } from 'uuid';
 
-const unsetGrupo = ['observacao', '__v', 'cor', 'principal'];
-const unsetPrato = ['observacao', '__v', 'composicoes'];
+const unsetIngredientes = ['observacao', '__v'];
+const unsetGrupo = [...unsetIngredientes, 'cor', 'principal'];
+const unsetPrato = [...unsetIngredientes, 'composicoes'];
 
 const aggregate = (marmitaId: string): PipelineStage[] => [
   {
@@ -93,6 +94,15 @@ const aggregate = (marmitaId: string): PipelineStage[] => [
         {
           $unwind: '$grupo',
         },
+        {
+          $lookup: {
+            from: 'ingredientes',
+            localField: 'ingredientes',
+            foreignField: '_id',
+            pipeline: [{ $unset: unsetIngredientes }],
+            as: 'ingredientes',
+          },
+        },
       ],
       as: 'prato',
     },
@@ -125,6 +135,15 @@ const aggregate = (marmitaId: string): PipelineStage[] => [
         },
         {
           $unwind: '$grupo',
+        },
+        {
+          $lookup: {
+            from: 'ingredientes',
+            localField: 'ingredientes',
+            foreignField: '_id',
+            pipeline: [{ $unset: unsetIngredientes }],
+            as: 'ingredientes',
+          },
         },
       ],
       as: 'acompanhamentos',
@@ -159,9 +178,9 @@ export class PedidoItemService implements ServicoInterface {
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
   ) {
-    this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
-      console.log(JSON.stringify(ret, null, 4));
-    });
+    /*  this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
+      console.log(JSON.stringify(ret.geral, null, 4));
+    }); */
   }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
@@ -244,7 +263,10 @@ export class PedidoItemService implements ServicoInterface {
 
   carregarRelatorio(marmitaId: string): Promise<any> {
     const pratos = new Map<string, PedidoRelatorioDto>();
-    const pratoGeral = new Map<string, { prato: string; quantidade: number }>();
+    const pratoGeral = new Map<
+      string,
+      { prato: string; quantidade: number; ingredientes: string[] }
+    >();
 
     const inserirItenPrato = (iten, prato, acompanha = false) => {
       const pratoId = prato._id.toString();
@@ -297,13 +319,16 @@ export class PedidoItemService implements ServicoInterface {
         }
       }
 
+      const ingredientes = prato?.ingredientes?.map((m: any) => m.nome) || [];
       if (!pratoGeral.has(pratoId)) {
         pratoGeral.set(pratoId, {
           prato: pratoNome,
           quantidade: iten.quantidade,
+          ingredientes: ingredientes,
         });
       } else {
         pratoGeral.get(pratoId).quantidade += iten.quantidade;
+        pratoGeral.get(pratoId).ingredientes.concat(...ingredientes);
       }
     };
 
@@ -311,6 +336,8 @@ export class PedidoItemService implements ServicoInterface {
       .aggregate(aggregate(marmitaId))
 
       .then((itens) => {
+        //console.log(JSON.stringify(itens, null, 4));
+
         itens.forEach((iten: any) => {
           inserirItenPrato(iten, iten.prato);
 
@@ -333,7 +360,16 @@ export class PedidoItemService implements ServicoInterface {
             return m;
           });
 
-        const retornoGeral = [...pratoGeral.values()];
+        const retornoGeral = [...pratoGeral.values()].map((m) => {
+          const ob = {
+            prato: m.prato,
+            quantidade: m.quantidade,
+          };
+          if (m.ingredientes && m.ingredientes.length > 0) {
+            ob['ingredientes'] = m.ingredientes;
+          }
+          return ob;
+        });
 
         return { pratos: retornoPratos, geral: retornoGeral };
       });

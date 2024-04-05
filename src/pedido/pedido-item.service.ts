@@ -319,7 +319,12 @@ export class PedidoItemService implements ServicoInterface {
         }
       }
 
-      const ingredientes = prato?.ingredientes?.map((m: any) => m.nome) || [];
+      const ingredientes =
+        prato?.ingredientes?.map((m: any) => {
+          return {
+            nome: m.nome,
+          };
+        }) || [];
       if (!pratoGeral.has(pratoId)) {
         pratoGeral.set(pratoId, {
           prato: pratoNome,

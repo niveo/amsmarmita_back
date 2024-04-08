@@ -11,10 +11,10 @@ import {
   PedidoRelatorioComedorDto,
   PedidoRelatorioDto,
 } from '../dtos/pedido-relatorio.dto';
-import { v5 as uuidv5 } from 'uuid';
+import { Ingrediente, Prato } from '../schemas';
 
 const unsetIngredientes = ['observacao', '__v'];
-const unsetGrupo = [...unsetIngredientes, 'cor', 'principal'];
+const unsetGrupo = [...unsetIngredientes, 'principal'];
 const unsetPrato = [...unsetIngredientes, 'composicoes'];
 
 const aggregate = (marmitaId: string): PipelineStage[] => [
@@ -178,9 +178,9 @@ export class PedidoItemService implements ServicoInterface {
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
   ) {
-    /*  this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
-      console.log(JSON.stringify(ret.geral, null, 4));
-    }); */
+    this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
+      // console.log(JSON.stringify(ret.pratos, null, 4));
+    });
   }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
@@ -261,30 +261,78 @@ export class PedidoItemService implements ServicoInterface {
       .exec();
   }
 
+  pratoNome = (prato: Prato) =>
+    (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
+
   carregarRelatorio(marmitaId: string): Promise<any> {
     const pratos = new Map<string, PedidoRelatorioDto>();
-    const pratoGeral = new Map<
+
+    const ingredientesMap = new Map<
       string,
-      { prato: string; quantidade: number; ingredientes: string[] }
+      {
+        nome: string;
+        quantidade: number;
+        pratos: Map<string, { nome: string; quantidade: number }>;
+      }
     >();
 
-    const inserirItenPrato = (iten, prato, acompanha = false) => {
+    const inserirIngredientes = (
+      f: Ingrediente,
+      prato: Prato,
+      iten: PedidoItem,
+    ) => {
       const pratoId = prato._id.toString();
-      const pratoNome =
-        (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
-      const _id = uuidv5(`${pratoId}-${acompanha}`, uuidv5.URL);
+      const ingredienteId = f._id!.toString();
+      if (!ingredientesMap.has(ingredienteId)) {
+        const cr = new Map<string, { nome: string; quantidade: number }>();
+
+        cr.set(prato._id.toString(), {
+          nome: prato.nome,
+          quantidade: iten.quantidade,
+        });
+        ingredientesMap.set(ingredienteId, {
+          nome: f.nome,
+          quantidade: iten.quantidade,
+          pratos: cr,
+        });
+      } else {
+        const ing = ingredientesMap.get(ingredienteId);
+        ing.quantidade += iten.quantidade;
+
+        if (!ing.pratos.has(pratoId)) {
+          ing.pratos.set(pratoId, {
+            nome: prato.nome,
+            quantidade: iten.quantidade,
+          });
+        } else {
+          const cpr = ing.pratos.get(pratoId);
+          cpr.quantidade += iten.quantidade;
+        }
+      }
+    };
+
+    const inserirItenPrato = (iten: PedidoItem, prato: Prato) => {
+      const pratoId = prato._id.toString();
+
+      const _id = pratoId;
 
       const comedorId = iten.pedido.comedor._id.toString();
 
       const comedorIten: PedidoRelatorioComedorDto = {
         comedor: iten.pedido.comedor.nome,
         quantidade: iten.quantidade,
+        de:
+          iten.acompanhamentos.map((m) => {
+            return {
+              nome: m.nome,
+              grupo: {
+                nome: m.grupo.nome,
+                multiplo: m.grupo.multiplo,
+                cor: m.grupo.cor,
+              },
+            };
+          }) || [],
       };
-
-      if (acompanha) {
-        if (!comedorIten.de) comedorIten.de = [];
-        comedorIten.de.push(iten.prato.nome);
-      }
 
       if (!pratos.has(_id)) {
         const comedores = new Map<string, PedidoRelatorioComedorDto>();
@@ -292,12 +340,10 @@ export class PedidoItemService implements ServicoInterface {
         comedores.set(comedorId, comedorIten);
 
         const base = new PedidoRelatorioDto();
-        base.prato = pratoNome;
+        base.prato = this.pratoNome(prato);
 
         base.quantidade = iten.quantidade;
         base.comedoresMap = comedores;
-
-        base['principal'] = !acompanha;
 
         pratos.set(_id, base);
       } else {
@@ -311,30 +357,18 @@ export class PedidoItemService implements ServicoInterface {
           const comedorIten = registro.comedoresMap.get(comedorId);
 
           comedorIten.quantidade += iten.quantidade;
-
-          if (acompanha) {
-            if (!comedorIten.de) comedorIten.de = [];
-            comedorIten.de.push(iten.prato.nome);
-          }
         }
       }
 
-      const ingredientes =
-        prato?.ingredientes?.map((m: any) => {
-          return {
-            nome: m.nome,
-          };
-        }) || [];
-      if (!pratoGeral.has(pratoId)) {
-        pratoGeral.set(pratoId, {
-          prato: pratoNome,
-          quantidade: iten.quantidade,
-          ingredientes: ingredientes,
+      prato?.ingredientes?.forEach((f: Ingrediente) => {
+        inserirIngredientes(f, prato, iten);
+      });
+
+      iten.acompanhamentos.forEach((c: Prato) => {
+        c?.ingredientes?.forEach((f: Ingrediente) => {
+          inserirIngredientes(f, c, iten);
         });
-      } else {
-        pratoGeral.get(pratoId).quantidade += iten.quantidade;
-        pratoGeral.get(pratoId).ingredientes.concat(...ingredientes);
-      }
+      });
     };
 
     return this.model
@@ -345,12 +379,6 @@ export class PedidoItemService implements ServicoInterface {
 
         itens.forEach((iten: any) => {
           inserirItenPrato(iten, iten.prato);
-
-          if (iten.acompanhamentos && iten.acompanhamentos.length > 0) {
-            iten.acompanhamentos.forEach((e: any) => {
-              inserirItenPrato(iten, e, true);
-            });
-          }
         });
 
         const retornoPratos = [...pratos.values()]
@@ -365,18 +393,16 @@ export class PedidoItemService implements ServicoInterface {
             return m;
           });
 
-        const retornoGeral = [...pratoGeral.values()].map((m) => {
+        const retornoIngredientes = [...ingredientesMap.values()].map((m) => {
           const ob = {
-            prato: m.prato,
+            nome: m.nome,
             quantidade: m.quantidade,
           };
-          if (m.ingredientes && m.ingredientes.length > 0) {
-            ob['ingredientes'] = m.ingredientes;
-          }
+          ob['pratos'] = [...m.pratos.values()].map((mp) => mp);
           return ob;
         });
 
-        return { pratos: retornoPratos, geral: retornoGeral };
+        return { pratos: retornoPratos, ingredientes: retornoIngredientes };
       });
   }
 }

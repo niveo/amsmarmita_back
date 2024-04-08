@@ -12,6 +12,7 @@ import {
   PedidoRelatorioDto,
 } from '../dtos/pedido-relatorio.dto';
 import { Ingrediente, Prato } from '../schemas';
+import { v5 as uuidv5 } from 'uuid';
 
 const unsetIngredientes = ['observacao', '__v'];
 const unsetGrupo = [...unsetIngredientes, 'principal'];
@@ -179,9 +180,9 @@ export class PedidoItemService implements ServicoInterface {
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
   ) {
-    this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
-      // console.log(JSON.stringify(ret.pratos, null, 4));
-    });
+    /*  this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
+      console.log(JSON.stringify(ret.pratos, null, 4));
+    }); */
   }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
@@ -312,10 +313,14 @@ export class PedidoItemService implements ServicoInterface {
       }
     };
 
-    const inserirItenPrato = (iten: PedidoItem, prato: Prato) => {
+    const inserirItenPrato = (
+      iten: PedidoItem,
+      prato: Prato,
+      acompanha = false,
+    ) => {
       const pratoId = prato._id.toString();
 
-      const _id = pratoId;
+      const _id = uuidv5(`${pratoId}-${acompanha}`, uuidv5.URL);
 
       const comedorId = iten.pedido.comedor._id.toString();
 
@@ -335,6 +340,11 @@ export class PedidoItemService implements ServicoInterface {
           }) || [],
       };
 
+      if (acompanha) {
+        if (!comedorIten.acompanha) comedorIten.acompanha = [];
+        comedorIten.acompanha.push(iten.prato.nome);
+      }
+
       if (!pratos.has(_id)) {
         const comedores = new Map<string, PedidoRelatorioComedorDto>();
 
@@ -345,6 +355,8 @@ export class PedidoItemService implements ServicoInterface {
 
         base.quantidade = iten.quantidade;
         base.comedoresMap = comedores;
+
+        base['principal'] = !acompanha;
 
         pratos.set(_id, base);
       } else {
@@ -358,18 +370,13 @@ export class PedidoItemService implements ServicoInterface {
           const comedorIten = registro.comedoresMap.get(comedorId);
 
           comedorIten.quantidade += iten.quantidade;
+
+          if (acompanha) {
+            if (!comedorIten.acompanha) comedorIten.acompanha = [];
+            comedorIten.acompanha.push(iten.prato.nome);
+          }
         }
       }
-
-      prato?.ingredientes?.forEach((f: Ingrediente) => {
-        inserirIngredientes(f, prato, iten);
-      });
-
-      iten.acompanhamentos.forEach((c: Prato) => {
-        c?.ingredientes?.forEach((f: Ingrediente) => {
-          inserirIngredientes(f, c, iten);
-        });
-      });
     };
 
     return this.model
@@ -378,8 +385,22 @@ export class PedidoItemService implements ServicoInterface {
       .then((itens) => {
         //console.log(JSON.stringify(itens, null, 4));
 
-        itens.forEach((iten: any) => {
+        itens.forEach((iten: PedidoItem) => {
           inserirItenPrato(iten, iten.prato);
+
+          iten.prato?.ingredientes?.forEach((f: Ingrediente) => {
+            inserirIngredientes(f, iten.prato, iten);
+          });
+
+          if (iten.acompanhamentos && iten.acompanhamentos.length > 0) {
+            iten.acompanhamentos.forEach((e: Prato) => {
+              inserirItenPrato(iten, e, true);
+
+              e?.ingredientes?.forEach((f: Ingrediente) => {
+                inserirIngredientes(f, e, iten);
+              });
+            });
+          }
         });
 
         const retornoPratos = [...pratos.values()]
@@ -405,7 +426,11 @@ export class PedidoItemService implements ServicoInterface {
           })
           .sort(this.sortNome);
 
-        return { pratos: retornoPratos, ingredientes: retornoIngredientes };
+        return {
+          pratos: retornoPratos.filter((f) => f.principal),
+          acompanhamentos: retornoPratos.filter((f) => !f.principal),
+          ingredientes: retornoIngredientes,
+        };
       });
   }
 }

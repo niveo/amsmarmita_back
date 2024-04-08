@@ -1,5 +1,6 @@
 export class PedidoRelatorioDto {
   prato: string;
+  principal: boolean;
   quantidade: number;
   comedoresMap?: Map<string, PedidoRelatorioComedorDto>;
   comedores(): PedidoRelatorioComedorDto[] {
@@ -18,4 +19,6 @@ export class PedidoRelatorioComedorDto {
       cor: string;
     };
   }[];
+
+  acompanha?: string[]
 }

@@ -170,6 +170,7 @@ const POPULATE = [
 export class PedidoItemService implements ServicoInterface {
   sortPrincipal = (a, b) => Number(b.principal) - Number(a.principal);
   sortPrato = (a, b) => a.prato!.localeCompare(b.prato!);
+  sortNome = (a, b) => a.nome!.localeCompare(b.nome!);
   sortComedor = (a: PedidoRelatorioComedorDto, b: PedidoRelatorioComedorDto) =>
     a.comedor!.localeCompare(b.comedor!);
 
@@ -393,14 +394,16 @@ export class PedidoItemService implements ServicoInterface {
             return m;
           });
 
-        const retornoIngredientes = [...ingredientesMap.values()].map((m) => {
-          const ob = {
-            nome: m.nome,
-            quantidade: m.quantidade,
-          };
-          ob['pratos'] = [...m.pratos.values()].map((mp) => mp);
-          return ob;
-        });
+        const retornoIngredientes = [...ingredientesMap.values()]
+          .map((m) => {
+            const ob = {
+              nome: m.nome,
+              quantidade: m.quantidade,
+            };
+            ob['pratos'] = [...m.pratos.values()].map((mp) => mp);
+            return ob;
+          })
+          .sort(this.sortNome);
 
         return { pratos: retornoPratos, ingredientes: retornoIngredientes };
       });

@@ -11,6 +11,7 @@ export class Ingrediente {
   @Prop({
     index: 'asc',
     isRequired: true,
+    unique: true,
     minlength: 2,
     maxlength: 50,
   })

@@ -26,6 +26,15 @@ export class InsertPratoDto {
   @Length(0, 100)
   observacao?: string;
 
+  @IsString()
+  @IsOptional()
+  @Length(0, 50)
+  icone?: string;
+
+  @IsString()
+  @IsOptional() 
+  imagem?: string;
+
   @IsArray()
   @IsOptional()
   ingredientes?: string[];

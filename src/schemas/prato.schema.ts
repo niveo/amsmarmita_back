@@ -30,6 +30,9 @@ export class Prato {
   })
   observacao: string;
 
+  @Prop()
+  imagem: string;
+
   @Prop({ type: [Types.ObjectId], ref: 'Ingrediente' })
   @Type(() => Ingrediente)
   ingredientes: Ingrediente[];

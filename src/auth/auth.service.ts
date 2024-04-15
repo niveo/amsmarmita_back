@@ -2,11 +2,14 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
+  IMAGEKIT_PRIVATE_KEY,
   JWT_EXPIRATION_TIME,
   JWT_SUB_KEY,
   PASSWORD,
 } from '../common/constantes';
 import { sha256 } from 'js-sha256';
+import { v4 } from 'uuid';
+import { createHmac } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +29,20 @@ export class AuthService {
     };
     return {
       access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+
+  authImageKit() {
+    const token = v4();
+    const expire = Number(Date.now() / 1000) + 2400;
+    const privateAPIKey = this.config.getOrThrow(IMAGEKIT_PRIVATE_KEY);
+    const signature = createHmac('sha1', privateAPIKey)
+      .update(token + expire)
+      .digest('hex');
+    return {
+      token: token,
+      expire: expire,
+      signature: signature,
     };
   }
 }

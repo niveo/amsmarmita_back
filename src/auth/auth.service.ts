@@ -8,8 +8,11 @@ import {
   PASSWORD,
 } from '../common/constantes';
 import { sha256 } from 'js-sha256';
-import { v4 } from 'uuid';
 import { createHmac } from 'crypto';
+
+import { extractTokenFromHeader } from 'src/common/utils';
+import { Request } from 'express';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -32,8 +35,8 @@ export class AuthService {
     };
   }
 
-  authImageKit() {
-    const token = v4();
+  authImageKit(req: Request) {
+    const token = extractTokenFromHeader(req) || v4();
     const expire = Number(Date.now() / 1000) + 2400;
     const privateAPIKey = this.config.getOrThrow(IMAGEKIT_PRIVATE_KEY);
     const signature = createHmac('sha1', privateAPIKey)

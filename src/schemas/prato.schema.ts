@@ -36,6 +36,12 @@ export class Prato {
   @Prop({ type: [Types.ObjectId], ref: 'Ingrediente' })
   @Type(() => Ingrediente)
   ingredientes: Ingrediente[];
+
+  @Prop({ index: 'asc', type: 'number' })
+  createdAt: number;
+
+  @Prop({ index: 'asc', type: 'number' })
+  updatedAt: number;
 }
 
 export const PratoSchema = SchemaFactory.createForClass(Prato);

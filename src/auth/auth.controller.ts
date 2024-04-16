@@ -11,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { Public } from './auth.util';
+import { Request as request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -26,9 +27,8 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Get('authimagekit')
-  authImageKit() {
-    console.log('authImageKit');
-    return this.authService.authImageKit();
+  authImageKit(@Request() req: request) {
+    return this.authService.authImageKit(req);
   }
 
   @UseGuards(AuthGuard)

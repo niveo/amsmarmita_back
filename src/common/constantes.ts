@@ -4,3 +4,4 @@ export const JWT_EXPIRATION_TIME = 'JWT_EXPIRATION_TIME';
 export const JWT_SUB_KEY = 'JWT_SUB_KEY';
 export const PASSWORD = 'PASSWORD';
 export const PRODUCAO_KEY = 'PRODUCAO';
+export const IMAGEKIT_PRIVATE_KEY = 'IMAGEKIT_PRIVATE_KEY';

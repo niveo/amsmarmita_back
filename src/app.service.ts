@@ -12,6 +12,8 @@ export class AppService {
 
   createPdf() {
     const fileName = v4() + '.pdf';
+    console.log(PDFKit);
+    
     const pd = new PDFKit();
     pd.fontSize(13).fillColor('#6155a4').text('Texto formatado', {
       align: 'center',

@@ -10,7 +10,7 @@ import {
 import { sha256 } from 'js-sha256';
 import { createHmac } from 'crypto';
 
-import { extractTokenFromHeader } from 'src/common/utils';
+import { extractTokenFromHeader } from '../common/utils';
 import { Request } from 'express';
 import { v4 } from 'uuid';
 

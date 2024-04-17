@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as PDFKit from 'pdfkit';
+import PDFKit from 'pdfkit';
 import { createWriteStream } from 'fs';
 import { join } from 'path';
 import { v4 } from 'uuid';

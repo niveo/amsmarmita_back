@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { IS_PUBLIC_KEY } from './auth.util';
 import { ConfigService } from '@nestjs/config';
 import { JWT_SECRET_KEY, PRODUCAO_KEY } from '../common/constantes';
-import { extractTokenFromHeader } from 'src/common/utils';
+import { extractTokenFromHeader } from '../common/utils';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

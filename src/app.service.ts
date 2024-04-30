@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import * as PDFKit from 'pdfkit';
+import PDFKit from 'pdfkit';
 import { createWriteStream } from 'fs';
 import { join } from 'path';
 import { v4 } from 'uuid';
+import os from 'os';
 
 @Injectable()
 export class AppService {
@@ -12,6 +13,8 @@ export class AppService {
 
   createPdf() {
     const fileName = v4() + '.pdf';
+    console.log(PDFKit);
+
     const pd = new PDFKit();
     pd.fontSize(13).fillColor('#6155a4').text('Texto formatado', {
       align: 'center',
@@ -24,9 +27,10 @@ export class AppService {
     pd.fontSize(20).fillColor('#6155a4').text('Texto formatado', {
       align: 'center',
     });
-    pd.pipe(createWriteStream(fileName));
+
+    pd.pipe(createWriteStream(join(os.tmpdir(), fileName)));
     pd.end();
 
-    return join(process.cwd(), fileName);
+    return join(os.tmpdir(), fileName);
   }
 }

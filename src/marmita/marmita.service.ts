@@ -6,6 +6,7 @@ import { InsertMarmitaDto } from '../dtos/insert-marmita.dto';
 import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
 import { PedidoService } from '../pedido/pedido.service';
 import { Marmita } from '../schemas';
+import { differenceInDays, differenceInBusinessDays } from 'date-fns';
 
 @Injectable()
 export class MarmitaService implements ServicoInterface {
@@ -14,7 +15,9 @@ export class MarmitaService implements ServicoInterface {
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
     @InjectConnection() private readonly connection: mongoose.Connection,
-  ) {}
+  ) {
+    this.findAll().then(console.log);
+  }
 
   async create(valueDto: InsertMarmitaDto): Promise<Marmita> {
     const createdCat = new this.model(valueDto);
@@ -26,7 +29,28 @@ export class MarmitaService implements ServicoInterface {
   }
 
   async findAll(): Promise<Marmita[]> {
-    return this.model.find().sort({ lancamento: -1 }).exec();
+    const registros = await this.model
+      .find()
+      .sort({ lancamento: -1 })
+      .lean()
+      .exec();
+    return registros.map((marmita: any, index: number) => {
+      const m = Object.assign(new Marmita(), marmita);
+
+      const anterior = registros[index + 1];
+      if (anterior) {
+        const last = marmita.lancamento;
+        const first = anterior.lancamento;
+
+        const businessDays = differenceInBusinessDays(last, first);
+        const inDays = differenceInDays(last, first);
+
+        m['diasUteis'] = businessDays;
+        m['diasCorridos'] = inDays;
+      }
+
+      return m;
+    });
   }
 
   async delete(id: string): Promise<boolean> {

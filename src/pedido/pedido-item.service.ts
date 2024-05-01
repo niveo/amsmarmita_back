@@ -15,7 +15,7 @@ import { Ingrediente, Prato } from '../schemas';
 import { v5 as uuidv5 } from 'uuid';
 
 const unsetIngredientes = ['observacao', '__v'];
-const unsetGrupo = [...unsetIngredientes, 'principal'];
+const unsetGrupo = [...unsetIngredientes ];
 const unsetPrato = [...unsetIngredientes, 'composicoes'];
 
 const aggregate = (marmitaId: string): PipelineStage[] => [

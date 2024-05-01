@@ -15,9 +15,7 @@ export class MarmitaService implements ServicoInterface {
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
     @InjectConnection() private readonly connection: mongoose.Connection,
-  ) {
-    this.findAll().then(console.log);
-  }
+  ) {}
 
   async create(valueDto: InsertMarmitaDto): Promise<Marmita> {
     const createdCat = new this.model(valueDto);

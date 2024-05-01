@@ -331,7 +331,7 @@ export class PedidoItemService implements ServicoInterface {
           iten.acompanhamentos.map((m) => {
             return {
               nome: m.nome,
-              principal: m.principal,
+              principal: m.grupo.principal,
               grupo: {
                 nome: m.grupo.nome,
                 multiplo: m.grupo.multiplo,

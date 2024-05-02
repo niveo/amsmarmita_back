@@ -9,7 +9,7 @@ import { PedidoItemService } from './pedido-item.service';
 @Module({
   controllers: [PedidoController, PedidoItemController],
   providers: [PedidoService, PedidoItemService],
-  exports: [PedidoService],
+  exports: [PedidoService, PedidoItemService],
   imports: [forwardRef(() => MarmitaModule), MongooseFeatureMogule],
 })
 export class PedidoModule {}

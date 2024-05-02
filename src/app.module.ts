@@ -18,6 +18,8 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseFeatureMogule } from './common/mongoose-feature.module';
 import { IngredienteService } from './services/ingrediente.service';
 import { IngredienteController } from './controllers/ingrediente.controller';
+import { RelatorioService } from './services/relatorio.service';
+import { RelatorioController } from './controllers/relatorio.controller';
 
 @Module({
   imports: [
@@ -40,12 +42,14 @@ import { IngredienteController } from './controllers/ingrediente.controller';
   ],
   controllers: [
     AppController,
+    RelatorioController,
     ComedorController,
     GrupoController,
     IngredienteController,
   ],
   providers: [
     AppService,
+    RelatorioService,
     ComedorService,
     GrupoService,
     IngredienteService,

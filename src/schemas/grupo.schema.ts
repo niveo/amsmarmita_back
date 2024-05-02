@@ -37,6 +37,11 @@ export class Grupo {
     maxlength: 7,
   })
   cor: string;
+
+  @Prop({
+    default: false,
+  })
+  somarRelatorio: boolean;
 }
 
 export const GrupoSchema = SchemaFactory.createForClass(Grupo);

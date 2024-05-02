@@ -126,8 +126,4 @@ export class PedidoService implements ServicoInterface {
       0
     );
   }
-
-  carregarRelatorio(marmitaId: string): Promise<any[]> {
-    return this.pedidoItemService.carregarRelatorio(marmitaId);
-  }
 }

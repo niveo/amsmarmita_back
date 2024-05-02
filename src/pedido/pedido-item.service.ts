@@ -15,7 +15,7 @@ import { Ingrediente, Prato } from '../schemas';
 import { v5 as uuidv5 } from 'uuid';
 
 const unsetIngredientes = ['observacao', '__v'];
-const unsetGrupo = [...unsetIngredientes ];
+const unsetGrupo = [...unsetIngredientes];
 const unsetPrato = [...unsetIngredientes, 'composicoes'];
 
 const aggregate = (marmitaId: string): PipelineStage[] => [
@@ -266,7 +266,9 @@ export class PedidoItemService implements ServicoInterface {
   pratoNome = (prato: Prato) =>
     (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
 
-  carregarRelatorio(marmitaId: string): Promise<any> {
+  carregarRelatorio(
+    marmitaId: string,
+  ): Promise<{ pratos: any[]; ingredientes: any[]; acompanhamentos: any[] }> {
     const pratos = new Map<string, PedidoRelatorioDto>();
 
     const ingredientesMap = new Map<
@@ -336,6 +338,7 @@ export class PedidoItemService implements ServicoInterface {
                 nome: m.grupo.nome,
                 multiplo: m.grupo.multiplo,
                 cor: m.grupo.cor,
+                principal: m.grupo.principal,
               },
             };
           }) || [],
@@ -353,6 +356,7 @@ export class PedidoItemService implements ServicoInterface {
 
         const base = new PedidoRelatorioDto();
         base.prato = this.pratoNome(prato);
+        base.grupo = prato.grupo;
 
         base.quantidade = iten.quantidade;
         base.comedoresMap = comedores;

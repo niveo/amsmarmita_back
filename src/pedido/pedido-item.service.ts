@@ -270,6 +270,10 @@ export class PedidoItemService implements ServicoInterface {
     marmitaId: string,
   ): Promise<{ pratos: any[]; ingredientes: any[]; acompanhamentos: any[] }> {
     const pratos = new Map<string, PedidoRelatorioDto>();
+    const comedoresTotal = new Map<
+      string,
+      { nome: string; quantidade: number }
+    >();
 
     const ingredientesMap = new Map<
       string,
@@ -391,6 +395,22 @@ export class PedidoItemService implements ServicoInterface {
         //console.log(JSON.stringify(itens, null, 4));
 
         itens.forEach((iten: PedidoItem) => {
+          if (
+            iten.prato.grupo.principal &&
+            !iten.prato.grupo.naoSomarRelatorioView
+          ) {
+            const com = iten.pedido.comedor;
+            if (!comedoresTotal.has(com._id.toString())) {
+              comedoresTotal.set(com._id.toString(), {
+                nome: com.nome,
+                quantidade: iten.quantidade,
+              });
+            } else {
+              comedoresTotal.get(com._id.toString()).quantidade +=
+                iten.quantidade;
+            }
+          }
+
           inserirItenPrato(iten, iten.prato);
 
           iten.prato?.ingredientes?.forEach((f: Ingrediente) => {
@@ -435,6 +455,7 @@ export class PedidoItemService implements ServicoInterface {
           pratos: retornoPratos.filter((f) => f.principal),
           acompanhamentos: retornoPratos.filter((f) => !f.principal),
           ingredientes: retornoIngredientes,
+          comedores: [...comedoresTotal.values()],
         };
       });
   }

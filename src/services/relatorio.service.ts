@@ -3,7 +3,12 @@ import { PedidoItemService } from '../pedido/pedido-item.service';
 import { ReadStream, createReadStream, createWriteStream, rmSync } from 'fs';
 import { join } from 'path';
 import * as os from 'os';
-import * as PDFKit from 'pdfkit';
+
+//import * as PDFKit from 'pdfkit';
+/**
+ * Vercel utiliza essa forma de import
+ */
+import PDFKit from 'pdfkit';
 import { v4 } from 'uuid';
 
 @Injectable()

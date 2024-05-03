@@ -42,6 +42,11 @@ export class Grupo {
     default: false,
   })
   somarRelatorio: boolean;
+
+  @Prop({
+    default: false,
+  })
+  naoSomarRelatorioView: boolean;
 }
 
 export const GrupoSchema = SchemaFactory.createForClass(Grupo);

@@ -25,9 +25,16 @@ export class InsertGrupoDto {
   @IsNotEmpty()
   multiplo?: boolean = false;
 
-
   @IsString()
   @IsOptional()
   @Length(0, 7)
   cor?: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  somarRelatorio?: boolean = false;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  naoSomarRelatorioView?: boolean = false;
 }

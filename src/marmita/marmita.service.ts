@@ -6,7 +6,13 @@ import { InsertMarmitaDto } from '../dtos/insert-marmita.dto';
 import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
 import { PedidoService } from '../pedido/pedido.service';
 import { Marmita } from '../schemas';
-import { differenceInDays, differenceInBusinessDays } from 'date-fns';
+import {
+  differenceInDays,
+  differenceInBusinessDays,
+  endOfMonth,
+  addMonths,
+  subMonths,
+} from 'date-fns';
 
 @Injectable()
 export class MarmitaService implements ServicoInterface {
@@ -26,11 +32,23 @@ export class MarmitaService implements ServicoInterface {
     return this.model.findById(id).exec();
   }
 
-  async findAll(): Promise<Marmita[]> {
-    const registros = await this.model
-      .find()
+  async listarDatas(): Promise<Marmita[]> {
+    return await this.model
+      .find({ lancamento: { $gt: endOfMonth(subMonths(new Date(), 1)) } })
       .sort({ lancamento: -1 })
       .lean()
+      .limit(50)
+      .exec();
+  }
+
+  async findAll(): Promise<Marmita[]> {
+    const registros = await this.model
+      .find({ lancamento: { $lt: endOfMonth(addMonths(new Date(), 0)) } })
+      .sort({ lancamento: -1 })
+      //https://mongoosejs.com/docs/tutorials/lean.html
+      //lean retorna apenas o POJO do objeto
+      .lean()
+      .limit(5)
       .exec();
     return registros.map((marmita: any, index: number) => {
       const m = Object.assign(new Marmita(), marmita);

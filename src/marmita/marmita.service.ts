@@ -43,7 +43,7 @@ export class MarmitaService implements ServicoInterface {
   async findAll(): Promise<Marmita[]> {
     const registros = await this.model
       .find({ lancamento: { $gt: endOfMonth(subMonths(new Date(), 2)) } })
-      .sort({ lancamento: -1 })
+      .sort({ lancamento: 1 })
       //https://mongoosejs.com/docs/tutorials/lean.html
       //lean retorna apenas o POJO do objeto
       .lean()

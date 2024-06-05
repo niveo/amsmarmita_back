@@ -54,8 +54,8 @@ export class MarmitaService implements ServicoInterface {
 
       const anterior = registros[index + 1];
       if (anterior) {
-        const last = marmita.lancamento;
-        const first = anterior.lancamento;
+        const last = anterior.lancamento;
+        const first = marmita.lancamento;
 
         const businessDays = differenceInBusinessDays(last, first);
         const inDays = differenceInDays(last, first);

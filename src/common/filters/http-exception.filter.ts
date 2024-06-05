@@ -8,11 +8,16 @@ import { Response } from 'express';
 import { ErroInternoException } from '../exceptions/errointerno.exception';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { MongooseError } from 'mongoose';
+import { MongoError } from 'mongodb';
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
   catch(
-    exception: HttpException | ErroInternoException | MongooseError,
+    exception:
+      | HttpException
+      | ErroInternoException
+      | MongooseError
+      | MongoError,
     host: ArgumentsHost,
   ) {
     const ctx = host.switchToHttp();
@@ -23,7 +28,13 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
       exception instanceof ErroInternoException
     ) {
       status = exception.getStatus();
+    } else if (exception instanceof MongoError) {
+      switch (exception.code) {
+        case 11000:
+          exception['message'] = 'Registro duplicado';
+      }
     }
+
     const request = ctx.getRequest<Request>();
 
     console.error(request.url);

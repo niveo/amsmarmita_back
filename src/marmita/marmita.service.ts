@@ -10,7 +10,6 @@ import {
   differenceInDays,
   differenceInBusinessDays,
   endOfMonth,
-  addMonths,
   subMonths,
 } from 'date-fns';
 
@@ -43,12 +42,12 @@ export class MarmitaService implements ServicoInterface {
 
   async findAll(): Promise<Marmita[]> {
     const registros = await this.model
-      .find({ lancamento: { $lt: endOfMonth(addMonths(new Date(), 0)) } })
+      .find({ lancamento: { $gt: endOfMonth(subMonths(new Date(), 2)) } })
       .sort({ lancamento: -1 })
       //https://mongoosejs.com/docs/tutorials/lean.html
       //lean retorna apenas o POJO do objeto
       .lean()
-      .limit(5)
+      .limit(50)
       .exec();
     return registros.map((marmita: any, index: number) => {
       const m = Object.assign(new Marmita(), marmita);

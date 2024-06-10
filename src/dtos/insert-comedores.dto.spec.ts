@@ -12,6 +12,15 @@ describe('InsertComerdoresDto', () => {
     expect(errors.length).toBe(1);
   });
 
+  it('Deve validar tamanho minimo de caracteres', async () => {
+    const myBodyObject = {
+      nome: 'A',
+    };
+    const myDtoObject = plainToInstance(InsertComerdoresDto, myBodyObject);
+    const errors = await validate(myDtoObject);
+    expect(errors.length).toBe(1);
+  });
+
   it('Deve validar tipo', async () => {
     const myBodyObject = {
       nome: 1,

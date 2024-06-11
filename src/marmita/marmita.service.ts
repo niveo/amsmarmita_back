@@ -12,6 +12,7 @@ import {
   endOfMonth,
   subMonths,
 } from 'date-fns';
+import { deprecate } from 'util';
 
 @Injectable()
 export class MarmitaService implements ServicoInterface {
@@ -31,6 +32,7 @@ export class MarmitaService implements ServicoInterface {
     return this.model.findById(id).exec();
   }
 
+  /** @deprecated use findAll instead, sera urilizado findAll no fron-end*/
   async listarDatas(): Promise<Marmita[]> {
     return await this.model
       .find({ lancamento: { $gt: endOfMonth(subMonths(new Date(), 1)) } })
@@ -57,11 +59,9 @@ export class MarmitaService implements ServicoInterface {
         const last = anterior.lancamento;
         const first = marmita.lancamento;
 
-        const businessDays = differenceInBusinessDays(last, first);
-        const inDays = differenceInDays(last, first);
-
-        m['diasUteis'] = businessDays;
-        m['diasCorridos'] = inDays;
+        m['diasUteis'] = differenceInBusinessDays(last, first);
+        m['diasCorridos'] = differenceInDays(last, first);
+        m['diasCorridosProxima'] = differenceInDays(last, new Date());
       }
 
       return m;

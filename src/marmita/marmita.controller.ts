@@ -10,7 +10,7 @@ import {
 import { InsertMarmitaDto } from '../dtos/insert-marmita.dto';
 import { UpdateMarmitaDto } from '../dtos/update-marmita.dto';
 import { MarmitaService } from './marmita.service';
-import { Marmita } from 'src/schemas';
+import { Marmita } from '../schemas';
 
 @Controller({
   path: 'marmitas',

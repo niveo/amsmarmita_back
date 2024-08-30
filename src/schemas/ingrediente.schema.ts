@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { TipoIngrediente } from 'src/enuns/tipoingrediente.enum';
-import { TipoMedida } from 'src/enuns/tipomedida.enum';
+import { TipoIngrediente } from '../enuns/tipoingrediente.enum';
+import { TipoMedida } from '../enuns/tipomedida.enum';
 
 export type IngredienteDocument = HydratedDocument<Ingrediente>;
 

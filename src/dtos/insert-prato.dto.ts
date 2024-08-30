@@ -32,10 +32,14 @@ export class InsertPratoDto {
   icone?: string;
 
   @IsString()
-  @IsOptional() 
+  @IsOptional()
   imagem?: string;
 
   @IsArray()
   @IsOptional()
   ingredientes?: string[];
+
+  @IsArray()
+  @IsOptional()
+  pratoIngredientes?: any[];
 }

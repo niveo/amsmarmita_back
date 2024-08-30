@@ -14,3 +14,5 @@ export const extractTokenFromHeader = (
   const [type, token] = request.headers.authorization?.split(' ') ?? [];
   return type === 'Bearer' ? token : undefined;
 };
+
+export const isEmptyStr = (value: any) => value === undefined || value === null || value === '';

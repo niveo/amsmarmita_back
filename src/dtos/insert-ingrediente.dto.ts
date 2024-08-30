@@ -14,10 +14,6 @@ export class InsertIngredienteDto {
   observacao?: string;
 
   @IsOptional()
-  @IsEnum(TipoMedida)
-  medida?: TipoMedida;
-
-  @IsOptional()
   @IsEnum(TipoIngrediente)
   tipo?: TipoIngrediente;
 

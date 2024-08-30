@@ -1,9 +1,9 @@
 export enum TipoMedida {
     OUTROS = "OUTROS",
-    G = "G",
-    KG = "KG",
-    ML = "ML",
-    L = "L",
-    UN = "UN",
-    DZ = "DZ"
+    g = "g",
+    kg = "kg",
+    ml = "ml",
+    l = "l",
+    un = "un",
+    dz = "dz"
 }

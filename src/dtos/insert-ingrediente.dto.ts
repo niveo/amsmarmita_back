@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Length } from 'class-validator';
+import { TipoIngrediente } from 'src/enuns/tipoingrediente.enum';
+import { TipoMedida } from 'src/enuns/tipomedida.enum';
 
 export class InsertIngredienteDto {
   @IsString()
@@ -10,4 +12,20 @@ export class InsertIngredienteDto {
   @IsOptional()
   @Length(0, 100)
   observacao?: string;
+
+  @IsOptional()
+  @IsEnum(TipoMedida)
+  medida?: TipoMedida;
+
+  @IsOptional()
+  @IsEnum(TipoIngrediente)
+  tipo?: TipoIngrediente;
+
+  @IsNumber()
+  @IsOptional()
+  embalagemQuantidade?: number;
+
+  @IsOptional()
+  @IsEnum(TipoMedida)
+  embalagemMedida?: TipoMedida;
 }

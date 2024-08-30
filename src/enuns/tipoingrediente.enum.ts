@@ -1,0 +1,7 @@
+export enum TipoIngrediente {
+    OUTROS = "OUTROS",
+    TEMPERO = "TEMPERO",
+    LEGUME_VERDURA = "LEGUME_VERDURA",
+    MERCADO = "MERCADO",
+    CARNE_FRIOS = "CARNE_FRIOS"
+}

@@ -74,7 +74,7 @@ export class PratoService implements ServicoInterface {
   }
 
   async registrarPratoIngrediente(registros: any[]): Promise<any[]> {
-    return registros.map((m) => {
+    return registros?.map((m) => {
       return {
         quantidade: m.quantidade,
         medida: m.medida,

@@ -5,5 +5,6 @@ export enum TipoMedida {
     ml = "ml",
     l = "l",
     un = "un",
-    dz = "dz"
+    dz = "dz",
+    undiv = "undiv"
 }

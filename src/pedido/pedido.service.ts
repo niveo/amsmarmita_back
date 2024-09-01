@@ -14,7 +14,8 @@ export class PedidoService implements ServicoInterface {
     @InjectModel(Pedido.name) private model: Model<Pedido>,
     private readonly pedidoItemService: PedidoItemService,
     @InjectConnection() private connection: Connection,
-  ) {}
+  ) {
+  }
 
   async create(valueDto: InsertPedidoDto): Promise<Pedido> {
     const createdCat = new this.model({
@@ -125,5 +126,9 @@ export class PedidoService implements ServicoInterface {
       (await this.model.deleteOne(where).session(session).exec()).deletedCount >
       0
     );
+  }
+
+  obterIdPedidosMarmitas(marmitaId: string) {
+    return this.model.find({ marmita: marmitaId.toObjectId() }).select(['_id']).exec();
   }
 }

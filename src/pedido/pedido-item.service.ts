@@ -1,6 +1,6 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage } from 'mongoose';
+import { Model } from 'mongoose';
 import { ServicoInterface } from '../interfaces/servicos.interface';
 import { ClientSession } from 'mongodb';
 import { PedidoService } from './pedido.service';
@@ -13,144 +13,7 @@ import {
 } from '../dtos/pedido-relatorio.dto';
 import { Ingrediente, Prato } from '../schemas';
 import { v5 as uuidv5 } from 'uuid';
-
-const unsetIngredientes = ['observacao', '__v'];
-const unsetGrupo = [...unsetIngredientes];
-const unsetPrato = [...unsetIngredientes, 'composicoes'];
-
-const aggregate = (marmitaId: string): PipelineStage[] => [
-  {
-    $lookup: {
-      from: 'pedidos',
-      localField: 'pedido',
-      foreignField: '_id',
-      pipeline: [
-        {
-          $lookup: {
-            from: 'marmitas',
-            localField: 'marmita',
-            foreignField: '_id',
-            pipeline: [
-              {
-                $match: {
-                  _id: marmitaId.toObjectId(),
-                },
-              },
-              {
-                $unset: ['__v'],
-              },
-            ],
-            as: 'marmita',
-          },
-        },
-        {
-          $lookup: {
-            from: 'comedores',
-            localField: 'comedor',
-            foreignField: '_id',
-            as: 'comedor',
-          },
-        },
-        {
-          $unset: ['observacao', '__v'],
-        },
-        {
-          $unwind: '$comedor',
-        },
-        {
-          $unwind: '$marmita',
-        },
-      ],
-      as: 'pedido',
-    },
-  },
-  {
-    $unwind: '$pedido',
-  },
-  {
-    $unset: ['observacao', '__v'],
-  },
-  {
-    $lookup: {
-      from: 'pratos',
-      localField: 'prato',
-      foreignField: '_id',
-      pipeline: [
-        {
-          $unset: unsetPrato,
-        },
-        {
-          $lookup: {
-            from: 'grupos',
-            localField: 'grupo',
-            foreignField: '_id',
-            pipeline: [
-              {
-                $unset: unsetGrupo,
-              },
-            ],
-            as: 'grupo',
-          },
-        },
-        {
-          $unwind: '$grupo',
-        },
-        {
-          $lookup: {
-            from: 'ingredientes',
-            localField: 'ingredientes',
-            foreignField: '_id',
-            pipeline: [{ $unset: unsetIngredientes }],
-            as: 'ingredientes',
-          },
-        },
-      ],
-      as: 'prato',
-    },
-  },
-  {
-    $unwind: '$prato',
-  },
-
-  {
-    $lookup: {
-      from: 'pratos',
-      localField: 'acompanhamentos',
-      foreignField: '_id',
-      pipeline: [
-        {
-          $unset: unsetPrato,
-        },
-        {
-          $lookup: {
-            from: 'grupos',
-            localField: 'grupo',
-            foreignField: '_id',
-            pipeline: [
-              {
-                $unset: unsetGrupo,
-              },
-            ],
-            as: 'grupo',
-          },
-        },
-        {
-          $unwind: '$grupo',
-        },
-        {
-          $lookup: {
-            from: 'ingredientes',
-            localField: 'ingredientes',
-            foreignField: '_id',
-            pipeline: [{ $unset: unsetIngredientes }],
-            as: 'ingredientes',
-          },
-        },
-      ],
-      as: 'acompanhamentos',
-    },
-  },
-];
+import { PratoIngrediente } from '../schemas/prato-ingrediente.schema';
 
 const POPULATE = [
   {
@@ -179,11 +42,7 @@ export class PedidoItemService implements ServicoInterface {
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
-  ) {
-    /*  this.carregarRelatorio('660c717d90c39e1a134e9b39').then((ret) => {
-      console.log(JSON.stringify(ret.pratos, null, 4));
-    }); */
-  }
+  ) { }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
     let pedido = await this.pedidoService.obterPedidoId(
@@ -263,6 +122,48 @@ export class PedidoItemService implements ServicoInterface {
       .exec();
   }
 
+  private async carregarRegistrosRelatorios(marmitaId: string) {
+    const pedidos = await this.pedidoService.obterIdPedidosMarmitas(marmitaId);
+    const populate = [
+      {
+        path: 'grupo',
+      },
+      {
+        path: 'ingredientes'
+      },
+      {
+        path: 'pratoIngredientes',
+        populate: [
+          {
+            path: 'ingrediente',
+          }
+        ]
+      }
+    ]
+    const ids = pedidos.map(m => m._id);
+    return await this.model.find({ pedido: { $in: ids } }).populate([
+      {
+        path: 'pedido',
+        populate: [
+          {
+            path: 'marmita',
+          },
+          {
+            path: 'comedor',
+          }
+        ]
+      },
+      {
+        path: 'prato',
+        populate: [...populate]
+      },
+      {
+        path: 'acompanhamentos',
+        populate: [...populate]
+      }
+    ]).exec();
+  }
+
   pratoNome = (prato: Prato) =>
     (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
 
@@ -285,21 +186,24 @@ export class PedidoItemService implements ServicoInterface {
     >();
 
     const inserirIngredientes = (
-      f: Ingrediente,
+      f: PratoIngrediente,
       prato: Prato,
       iten: PedidoItem,
     ) => {
+
+      if (f.ingrediente == null) return
+
       const pratoId = prato._id.toString();
-      const ingredienteId = f._id!.toString();
+      const ingredienteId = f.ingrediente._id!.toString();
       if (!ingredientesMap.has(ingredienteId)) {
         const cr = new Map<string, { nome: string; quantidade: number }>();
 
-        cr.set(prato._id.toString(), {
-          nome: prato.nome,
-          quantidade: iten.quantidade,
-        });
+          cr.set(prato._id.toString(), {
+            nome: prato.nome,
+            quantidade: iten.quantidade,
+          });
         ingredientesMap.set(ingredienteId, {
-          nome: f.nome,
+          nome: f.ingrediente.nome,
           quantidade: iten.quantidade,
           pratos: cr,
         });
@@ -388,9 +292,7 @@ export class PedidoItemService implements ServicoInterface {
       }
     };
 
-    return this.model
-      .aggregate(aggregate(marmitaId))
-
+    return this.carregarRegistrosRelatorios(marmitaId)
       .then((itens) => {
         //console.log(JSON.stringify(itens, null, 4));
 
@@ -413,7 +315,8 @@ export class PedidoItemService implements ServicoInterface {
 
           inserirItenPrato(iten, iten.prato);
 
-          iten.prato?.ingredientes?.forEach((f: Ingrediente) => {
+          iten.prato?.pratoIngredientes?.forEach((f: PratoIngrediente) => {
+            //Pode existir um Ingrediente sem vinculo nos docs de Ingredientes
             inserirIngredientes(f, iten.prato, iten);
           });
 
@@ -421,7 +324,8 @@ export class PedidoItemService implements ServicoInterface {
             iten.acompanhamentos.forEach((e: Prato) => {
               inserirItenPrato(iten, e, true);
 
-              e?.ingredientes?.forEach((f: Ingrediente) => {
+              e?.pratoIngredientes?.forEach((f: PratoIngrediente) => {
+                //Pode existir um Ingrediente sem vinculo nos docs de Ingredientes
                 inserirIngredientes(f, e, iten);
               });
             });

@@ -32,6 +32,15 @@ export class Ingrediente {
 
 
   @Prop({ type: 'number' })
+  quantidade: number;
+
+  @Prop({
+    type: String,
+    enum: TipoMedida
+  })
+  medida: TipoMedida;
+
+  @Prop({ type: 'number' })
   embalagemQuantidade: number;
 
   @Prop({

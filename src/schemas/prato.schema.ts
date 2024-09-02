@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Grupo } from './grupo.schema';
 import { Type } from 'class-transformer';
-import { Ingrediente } from './ingrediente.schema';
 import { PratoIngrediente } from './prato-ingrediente.schema';
 
 export type PratoDocument = HydratedDocument<Prato>;
@@ -34,9 +33,6 @@ export class Prato {
   @Prop()
   imagem: string;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Ingrediente' })
-  @Type(() => Ingrediente)
-  ingredientes: Ingrediente[];
 
   @Prop({ type: [PratoIngrediente] })
   @Type(() => PratoIngrediente)

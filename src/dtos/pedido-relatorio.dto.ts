@@ -1,3 +1,5 @@
+import { TipoMedida } from "../enuns/tipomedida.enum";
+
 export class PedidoRelatorioDto {
   prato: string;
   principal: boolean;
@@ -9,6 +11,8 @@ export class PedidoRelatorioDto {
     somarRelatorio: boolean;
   };
   comedoresMap?: Map<string, PedidoRelatorioComedorDto>;
+  medida: TipoMedida;
+  quantidadeMedida: number;
   comedores(): PedidoRelatorioComedorDto[] {
     return [...this.comedoresMap.values()];
   }

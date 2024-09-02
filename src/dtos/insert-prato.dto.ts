@@ -37,9 +37,5 @@ export class InsertPratoDto {
 
   @IsArray()
   @IsOptional()
-  ingredientes?: string[];
-
-  @IsArray()
-  @IsOptional()
   pratoIngredientes?: any[];
 }

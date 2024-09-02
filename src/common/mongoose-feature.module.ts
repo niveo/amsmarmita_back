@@ -15,6 +15,7 @@ import {
   PedidoSchema,
   Prato,
   PratoSchema,
+  Parametros, ParametrosSchema
 } from '../schemas';
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import {
       },
       { name: Comedor.name, schema: ComedorSchema },
       { name: Ingrediente.name, schema: IngredienteSchema },
+      { name: Parametros.name, schema: ParametrosSchema },
     ]),
   ],
   exports: [MongooseModule],

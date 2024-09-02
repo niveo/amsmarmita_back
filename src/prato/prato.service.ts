@@ -23,20 +23,6 @@ export class PratoService implements ServicoInterface {
 
 
   constructor(@InjectModel(Prato.name) private model: Model<Prato>) {
-    /* 
-        this.model.find().then(td => {
-          td.forEach(async f => {
-            if (f.ingredientes && f.ingredientes.length > 0) {
-              const ret = f.ingredientes.map(m => {
-                return {
-                  ingrediente: m._id,
-                }
-              })
-              this.model.updateOne({ _id: f.id.toString() }, { "pratoIngredientes": ret }).exec().then(console.log).catch(console.error)
-            }
-          })
-          console.log('F')
-        }) */
   }
 
   async create(valueDto: InsertPratoDto): Promise<Prato> {
@@ -44,7 +30,6 @@ export class PratoService implements ServicoInterface {
     const data: any = {
       ...valueDto,
       grupo: valueDto.grupo.toObjectId(),
-      ingredientes: valueDto.ingredientes?.map((m) => m.toObjectId()),
       pratoIngredientes: pratoIngredientes,
     };
     const createdCat = new this.model(data);
@@ -91,7 +76,6 @@ export class PratoService implements ServicoInterface {
         {
           ...valueDto,
           grupo: valueDto.grupo.toObjectId(),
-          ingredientes: valueDto.ingredientes?.map((m) => m.toObjectId()),
           pratoIngredientes: pratoIngredientes,
         },
         {

@@ -11,9 +11,14 @@ import {
   PedidoRelatorioComedorDto,
   PedidoRelatorioDto,
 } from '../dtos/pedido-relatorio.dto';
-import { Ingrediente, Prato } from '../schemas';
+import { Parametros, Prato } from '../schemas';
 import { v5 as uuidv5 } from 'uuid';
 import { PratoIngrediente } from '../schemas/prato-ingrediente.schema';
+//import * as datajs from "../../data/res.json";
+import { isEmptyStr } from '../common/utils';
+import { TipoMedida } from '../enuns/tipomedida.enum';
+import { TipoIngrediente } from '../enuns/tipoingrediente.enum';
+import { ParametroService } from '../services/parametros.service';
 
 const POPULATE = [
   {
@@ -42,7 +47,11 @@ export class PedidoItemService implements ServicoInterface {
     @InjectModel(PedidoItem.name) private model: Model<PedidoItem>,
     @Inject(forwardRef(() => PedidoService))
     private readonly pedidoService: PedidoService,
-  ) { }
+    @Inject(forwardRef(() => ParametroService))
+    private readonly parametrosService: ParametroService
+  ) {
+
+  }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
     let pedido = await this.pedidoService.obterPedidoId(
@@ -123,13 +132,14 @@ export class PedidoItemService implements ServicoInterface {
   }
 
   private async carregarRegistrosRelatorios(marmitaId: string) {
+
+
+    //return new Promise<any>((a, b) => a(datajs));
+
     const pedidos = await this.pedidoService.obterIdPedidosMarmitas(marmitaId);
     const populate = [
       {
         path: 'grupo',
-      },
-      {
-        path: 'ingredientes'
       },
       {
         path: 'pratoIngredientes',
@@ -167,7 +177,7 @@ export class PedidoItemService implements ServicoInterface {
   pratoNome = (prato: Prato) =>
     (prato.grupo.multiplo ? `${prato.grupo.nome}\/` : '') + prato.nome;
 
-  carregarRelatorio(
+  async carregarRelatorio(
     marmitaId: string,
   ): Promise<{ pratos: any[]; ingredientes: any[]; acompanhamentos: any[] }> {
     const pratos = new Map<string, PedidoRelatorioDto>();
@@ -176,14 +186,38 @@ export class PedidoItemService implements ServicoInterface {
       { nome: string; quantidade: number }
     >();
 
+    const pConversao = await this.parametrosService.findByChave('c564d01d-3529-4d95-8b50-d620acd6f64b')
+
     const ingredientesMap = new Map<
       string,
       {
         nome: string;
         quantidade: number;
-        pratos: Map<string, { nome: string; quantidade: number }>;
+        medida: TipoMedida;
+        medidaQuantidade: number;
+        tipo: TipoIngrediente;
+        alerta: boolean;
+        pratos: Map<string, {
+          nome: string; quantidade: number;        
+          medidaOrigem: { medida: TipoMedida; quantidade: number; }
+          medidaCalculo: { medida: TipoMedida; quantidade: number; }
+
+        }>;
       }
     >();
+
+    const obterMedidas = (f: PratoIngrediente): { medida: TipoMedida, quantidade: number } => {
+      if (f.medida === TipoMedida.OUTROS) return;
+      if (!isEmptyStr(f.medida)) {
+        return { "medida": f.medida, "quantidade": f.quantidade }
+      } else {
+        if (!isEmptyStr(f.ingrediente?.medida)) {
+          return {
+            "medida": f.ingrediente?.medida, "quantidade": f.ingrediente?.quantidade
+          }
+        }
+      }
+    }
 
     const inserirIngredientes = (
       f: PratoIngrediente,
@@ -193,32 +227,59 @@ export class PedidoItemService implements ServicoInterface {
 
       if (f.ingrediente == null) return
 
+      const index = prato.pratoIngredientes.findIndex(c => c.ingrediente.nome == f.ingrediente.nome)
+      const medidaG = obterMedidas(prato.pratoIngredientes[index])
+
+      const medida: any = medidaG?.medida || TipoMedida.OUTROS
+      const medidaQuantidade = medidaG?.quantidade || 0
+
+      const alerta = medida === TipoMedida.OUTROS
+
       const pratoId = prato._id.toString();
       const ingredienteId = f.ingrediente._id!.toString();
       if (!ingredientesMap.has(ingredienteId)) {
-        const cr = new Map<string, { nome: string; quantidade: number }>();
+        const cr = new Map<string, {
+          nome: string;
+          quantidade: number;
+          medidaOrigem: { medida: TipoMedida; quantidade: number; }
+          medidaCalculo: { medida: TipoMedida; quantidade: number; }
+        }>();
 
-          cr.set(prato._id.toString(), {
-            nome: prato.nome,
-            quantidade: iten.quantidade,
-          });
+        cr.set(prato._id.toString(), {
+          nome: prato.nome,
+          quantidade: iten.quantidade,
+          medidaCalculo: { medida, quantidade: iten.quantidade * medidaQuantidade },
+          medidaOrigem: { medida, quantidade: medidaQuantidade }
+        });
         ingredientesMap.set(ingredienteId, {
           nome: f.ingrediente.nome,
           quantidade: iten.quantidade,
+          medida: medida,
+          medidaQuantidade: iten.quantidade * medidaQuantidade,
+          tipo: f.ingrediente.tipo,
           pratos: cr,
+          alerta: alerta,
+
         });
       } else {
         const ing = ingredientesMap.get(ingredienteId);
         ing.quantidade += iten.quantidade;
+        ing.alerta = alerta;
+        if (medidaQuantidade)
+          ing.medidaQuantidade += iten.quantidade * medidaQuantidade
 
         if (!ing.pratos.has(pratoId)) {
           ing.pratos.set(pratoId, {
             nome: prato.nome,
             quantidade: iten.quantidade,
+            medidaCalculo: { medida, quantidade: iten.quantidade * medidaQuantidade },
+            medidaOrigem: { medida, quantidade: medidaQuantidade }
           });
         } else {
           const cpr = ing.pratos.get(pratoId);
           cpr.quantidade += iten.quantidade;
+          if (medidaQuantidade)
+            cpr.medidaCalculo.quantidade += iten.quantidade * medidaQuantidade
         }
       }
     };
@@ -346,11 +407,30 @@ export class PedidoItemService implements ServicoInterface {
 
         const retornoIngredientes = [...ingredientesMap.values()]
           .map((m) => {
+
+
+            const convertido = this.aplicarConversao(m.medida, m.medidaQuantidade, pConversao);
+            m.medida = convertido.medida
+            m.medidaQuantidade = convertido.quantidade
+
             const ob = {
               nome: m.nome,
               quantidade: m.quantidade,
+              medida: m.medida,
+              medidaQuantidade: m.medidaQuantidade,
+              tipo: m.tipo,
+              alerta : m.alerta
             };
-            ob['pratos'] = [...m.pratos.values()].map((mp) => mp);
+            ob['pratos'] = [...m.pratos.values()].map((mp) => {
+              //const converteMedidaCalculo = this.aplicarConversao(mp.medidaCalculo.medida, mp.medidaCalculo.quantidade, pConversao);
+              mp.medidaCalculo.medida = mp.medidaCalculo.medida
+              mp.medidaCalculo.quantidade = mp.medidaCalculo.quantidade
+
+              //const converteMedidaOrigem = this.aplicarConversao(mp.medidaOrigem.medida, mp.medidaOrigem.quantidade, pConversao);
+              mp.medidaOrigem.medida = mp.medidaOrigem.medida
+              mp.medidaOrigem.quantidade = mp.medidaOrigem.quantidade
+              return mp
+            });
             return ob;
           })
           .sort(this.sortNome);
@@ -362,5 +442,9 @@ export class PedidoItemService implements ServicoInterface {
           comedores: [...comedoresTotal.values()],
         };
       });
+  }
+
+  aplicarConversao(medida: TipoMedida, quantidade: number, pConversao: Parametros): any {
+    return Function('medida, quantidade', pConversao.valor)(medida, quantidade);
   }
 }

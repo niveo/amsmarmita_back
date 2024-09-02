@@ -20,6 +20,7 @@ import { IngredienteService } from './services/ingrediente.service';
 import { IngredienteController } from './controllers/ingrediente.controller';
 import { RelatorioService } from './services/relatorio.service';
 import { RelatorioController } from './controllers/relatorio.controller';
+import { ParametroService } from './services/parametros.service';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { RelatorioController } from './controllers/relatorio.controller';
     ComedorService,
     GrupoService,
     IngredienteService,
+    ParametroService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

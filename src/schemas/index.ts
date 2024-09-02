@@ -5,3 +5,4 @@ export * from './pedido-item.schema';
 export * from './pedido.schema';
 export * from './prato.schema';
 export * from './ingrediente.schema';
+export * from './parametros.schema';

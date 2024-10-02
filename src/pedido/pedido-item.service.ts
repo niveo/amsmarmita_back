@@ -50,7 +50,6 @@ export class PedidoItemService implements ServicoInterface {
     @Inject(forwardRef(() => ParametroService))
     private readonly parametrosService: ParametroService
   ) {
-
   }
 
   async create(valueDto: InsertPedidoItemDto): Promise<PedidoItem> {
@@ -227,7 +226,7 @@ export class PedidoItemService implements ServicoInterface {
 
       if (f.ingrediente == null) return
 
-      const index = prato.pratoIngredientes.findIndex(c => c.ingrediente.nome == f.ingrediente.nome)
+      const index = prato.pratoIngredientes.findIndex(c => c.ingrediente && c.ingrediente.nome == f.ingrediente.nome)
       const medidaG = obterMedidas(prato.pratoIngredientes[index])
 
       const medida: any = medidaG?.medida || TipoMedida.OUTROS

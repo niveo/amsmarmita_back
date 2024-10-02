@@ -16,10 +16,12 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async signIn(pass: string): Promise<{ access_token: string }> {
+
     const passsh256 = sha256.update(this.config.get(PASSWORD)).hex();
+
     if (passsh256 !== pass) {
       throw new UnauthorizedException();
     }
@@ -27,8 +29,11 @@ export class AuthService {
       sub: this.config.get(JWT_SUB_KEY),
       expiresIn: this.config.get(JWT_EXPIRATION_TIME),
     };
+
+    const token = await this.jwtService.signAsync(payload)
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: token,
     };
   }
 
